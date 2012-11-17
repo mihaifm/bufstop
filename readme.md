@@ -1,5 +1,7 @@
 ##Bufstop
 
+**[Short demo](http://www.youtube.com/watch?v=dM-SP3pI_8E)**
+
 Bufstop is a plugin for buffer switching, built for efficiency and less keystrokes.
 
 It provides a single command, :Bufstop. When issued, it opens a new window
