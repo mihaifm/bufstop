@@ -2,7 +2,7 @@ function! s:Init()
   let s:name = "[Bufstop]"
   let s:lsoutput = ""
   let s:types = {"fullname": ':p', "path": ':p:h', "shortname": ':t'}
-  let s:keystr = "1234asfgcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVXZ"
+  let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVXZ"
   let s:keys = split(s:keystr, '\zs')
 endfunction
 
