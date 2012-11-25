@@ -1,10 +1,15 @@
-function! s:Init()
-  let s:name = "[Bufstop]"
-  let s:lsoutput = ""
-  let s:types = {"fullname": ':p', "path": ':p:h', "shortname": ':t'}
-  let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVXZ"
-  let s:keys = split(s:keystr, '\zs')
-endfunction
+if exists('g:Bufstop_loaded') 
+  finish
+endif
+
+let g:Bufstop_loaded = 1
+
+let s:name = "--Bufstop--"
+let s:lsoutput = ""
+let s:types = {"fullname": ':p', "path": ':p:h', "shortname": ':t'}
+let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVXZ"
+let s:keys = split(s:keystr, '\zs')
+let s:local_bufnr = -1
 
 function! s:SetProperties()
   setlocal nonumber
@@ -116,16 +121,9 @@ function! s:GetBufferInfo()
 endfunction
 
 function! Bufstop()
-  call s:Init()
-  
   redir => s:lsoutput 
   exe "silent ls"
   redir END
-
-  exe "botright 15 split"
-  exe "silent keepjumps e".s:name
-
-  call s:SetProperties()
 
   let lines = []
   let bufdata = s:GetBufferInfo()
@@ -140,10 +138,21 @@ function! Bufstop()
     
     call add(lines, line)
   endfor
+  
+  exe "botright " . len(lines) . " split"
 
+  if s:local_bufnr < 0
+    exe "silent e ".s:name
+    let s:local_bufnr = bufnr(s:name)
+  else
+    exe "b ".s:local_bufnr
+  endif
+  
   setlocal modifiable
   call setline(1, lines)
   setlocal nomodifiable
+
+  call s:SetProperties()
 
   call s:MapKeys()
 endfunction
