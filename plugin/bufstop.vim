@@ -11,6 +11,8 @@ let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVXZ"
 let s:keys = split(s:keystr, '\zs')
 let s:local_bufnr = -1
 
+let g:Bufstop_history = []
+
 function! s:SetProperties()
   setlocal nonumber
   setlocal foldcolumn=0
@@ -86,7 +88,11 @@ function! s:GetBufferInfo()
  
   let k = 0
 
-  for buf in split(s:lsoutput, '\n')
+  let bu_li = split(s:lsoutput, '\n')
+  let g:Cacamaca = copy(bu_li)
+  call sort(bu_li, "<SID>BufstopMRUCmp")
+
+  for buf in bu_li
     let bits = split(buf, '"')
     let b = {"attributes": bits[0], "line": substitute(bits[2], '\s*', '', '')} 
     
@@ -157,4 +163,115 @@ function! Bufstop()
   call s:MapKeys()
 endfunction
 
+" Open the previous buffer in the navigation history for the current window.
+function s:BufstopBack()
+  if (!buflisted(winbufnr(winnr())))
+    return
+  endif
+
+  if w:history_index > 0
+    let w:history_index -= 1
+    let bno = w:history[w:history_index]
+    if (bufexists(bno) && buflisted(bno))
+      execute "b " . bno
+    else
+      call map(w:history, 's:BufstopFilt(v:val, bno)')
+      call s:BufstopBack()
+    endif
+  else
+    " since we're here, do some cleanup
+    call filter(w:history, 'v:val != -1')
+    let w:history_index = 0
+    call s:BufstopEcho("reached the bottom of window navigation history")
+  endif
+endfunction
+
+" Open the next buffer in the navigation history for the current window.
+function! s:BufstopForward()
+  if (!buflisted(winbufnr(winnr())))
+    return
+  endif
+
+  if w:history_index < len(w:history) - 1
+    let w:history_index += 1
+    let bno = w:history[w:history_index]
+    if (bufexists(bno) && buflisted(bno))
+      execute "b " . bno
+    else
+      call map(w:history, 's:BufstopFilt(v:val, bno)')
+      call s:BufstopForward()
+    endif
+  else
+    " since we're here, do some cleanup
+    call filter(w:history, 'v:val != -1')
+    let w:history_index = len(w:history) - 1
+    call s:BufstopEcho("reached the top of window navigation history")
+  endif
+endfunction
+
+" callback for map function
+function! s:BufstopFilt(val, bufnr)
+  if (a:val == a:bufnr)
+    return -1
+  endif
+
+  return a:val
+endfunction
+
+" Add the buffer number to the navigation history for the window
+function! s:BufstopAppend(bufnr)
+    if !exists('w:history_index')
+      let w:history_index = 0
+      let w:history = []
+    " ignore if the newly added buffer is the same as the previous active one
+    elseif w:history[w:history_index] == a:bufnr
+        return
+    else
+        let w:history_index += 1
+    endif
+
+    " replace the bufnr with -1 if it already exists
+    call map(w:history, 's:BufstopFilt(v:val, a:bufnr)')
+
+    let w:history = insert(w:history, a:bufnr, w:history_index)
+endfunction
+
+" Add the buffer number to the global navigation history 
+function! s:BufstopGlobalAppend(bufnr)
+  call filter(g:Bufstop_history, 'v:val != '.a:bufnr) 
+  call insert(g:Bufstop_history, a:bufnr)
+endfunction
+
+" Echo a message in the Vim status line.
+function! s:BufstopEcho(msg)
+  echohl WarningMsg
+  echomsg 'Bufstop: ' . a:msg
+  echohl None
+endfunction
+
+function! s:BufstopMRUCmp(line1, line2)
+  let i1 = index(g:Bufstop_history, str2nr(a:line1))
+  let i2 = index(g:Bufstop_history, str2nr(a:line2))
+  " make sure the buffers that are not in history end up at the bottom
+  if i1 == -1
+    let i1 = len(g:Bufstop_history) + 1
+  endif
+  if i2 == -1
+    let i2 = len(g:Bufstop_history) + 1
+  endif
+
+  return  i1 - i2
+endfunction
+
+augroup Bufstop
+  autocmd!
+  autocmd BufEnter * :call s:BufstopAppend(winbufnr(winnr()))
+  autocmd WinEnter * :call s:BufstopAppend(winbufnr(winnr()))
+  autocmd BufWinEnter * :call s:BufstopGlobalAppend(expand('<abuf>') + 0)
+augroup End
+
+
 command! Bufstop :call Bufstop()
+command! BufstopBack :call <SID>BufstopBack()
+command! BufstopForward :call <SID>BufstopForward()
+
