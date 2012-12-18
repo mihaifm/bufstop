@@ -4,18 +4,6 @@ Bufstop is a plugin for fast buffer switching, built for efficiency and less key
 
 Here is a **[short demo](http://www.youtube.com/watch?v=dM-SP3pI_8E)**
 
-It provides a single command, :Bufstop. When issued, it opens a new window
-at the bottom of the screen, that contains the list of current buffers.
-Each buffer has an associated hotkey displayed besides it. When the hotkey is
-pressed, the buffer is loaded in the current window (the window that was
-previously active before loading Bufstop).
-
-Bufstop is more efficient than the native `:ls` comamnd, since it can be used
-to quickly preview opened files without closing the buffer list.
-
-The Bufstop window is easily dismissed with the `<Esc>` key.
-
-
 **Bufstop** is a plugin for fast buffer switching, built for efficiency and less keystrokes.
 
 It provides a `:Bufstop` command that opens a new window at the bottom of the 
@@ -24,17 +12,17 @@ Each buffer has an associated hotkey displayed besides it. When the hotkey is
 pressed, the buffer is loaded in preview mode (it's opened in the most 
 recent window without closing the **Bufstop** window).
 
-Bufstop is more efficient than the native `:ls` comamnd, since it can be used
-to quickly preview opened files without closing the buffer list, and in 
-general it requires less key strokes to open a buffer than other plugins.
+Bufstop is more productive than using the native `:ls` and `:b` comamnds, since it can be used
+to quickly preview opened files without closing the buffer list, and in general it requires 
+less key strokes to open a buffer than other plugins.
 
-The `Bufstop` window is easily dismissed with the `<Esc>` key.
+The **Bufstop** window is easily dismissed with the `<Esc>` key.
 
 This plugin also provides navigation history for each window. Use the 
 `:BufstopForward` and `:BufstopBack` commands to quickly navigate the buffers
 in the order they were opened.
 
-Recommended |vimrc| mappings for these commands:
+Recommended `vimrc` mappings for these commands:
     
     map <leader>b :Bufstop<CR>
     map <C-tab>   :BufstopBack<CR>
@@ -46,18 +34,18 @@ Usage
 
 This plugin provides the following commands:
 
-  :Bufstop
+    :Bufstop
 
-Invokes the |Bufstop| window. Inside it, each buffer will have an associated 
+Invokes the `Bufstop` window. Inside it, each buffer will have an associated 
 hotkey that can be used to open the buffer. 
 
-In addition, the following key mappings are present in the |Bufstop| window:
+In addition, the following key mappings are present in the `Bufstop` window:
 
     d          wipe the selected buffer.
     <CR>       Open the selected buffer.
     <Esc>      Dismiss the Bufstop window
     k,j        Move up/down to select a buffer.
-
+<br>
 
     :BufstopBack
 
