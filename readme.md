@@ -2,7 +2,8 @@
 
 Bufstop is a plugin for fast buffer switching, built for efficiency and less keystrokes.
 
-Here is a **[short demo](http://www.youtube.com/watch?v=dM-SP3pI_8E)**
+Here is a **[short demo](http://www.youtube.com/watch?v=IwZSI-ZEoUY)** and 
+**[screenshot](https://raw.github.com/mihaifm/bufstop/master/screen.png)**
 
 **Bufstop** is a plugin for fast buffer switching, built for efficiency and less keystrokes.
 
