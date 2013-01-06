@@ -6,8 +6,8 @@ let g:Bufstop_loaded = 1
 
 let s:name = "--Bufstop--"
 let s:lsoutput = ""
-let s:types = {"fullname": ':p', "path": ':p:h', "shortname": ':t'}
-let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVXZ"
+let s:types = ["fullname", "path", "shortname"]
+let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"
 let s:keys = split(s:keystr, '\zs')
 let s:local_bufnr = -1
 
@@ -25,11 +25,11 @@ function! s:SetProperties()
   setlocal nowrap
 
   if has("syntax")
-    syn match bufstopBufKey /\v^\s*(\d|\a)/ contained
-    syn match bufstopBufName /\v^\s*(\d|\a)\s+.+\s\s/ contains=bufstopBufKey
+    syn match bufstopKey /\v^\s\s(\d|\a|\s)/ contained
+    syn match bufstopName /\v^\s\s(\d|\a|\s)\s+.+\s\s/ contains=bufstopKey
    
-    hi def link bufstopBufKey String
-    hi def link bufstopBufName Type
+    hi def link bufstopKey String
+    hi def link bufstopName Type
   endif
 endfunction
 
@@ -49,6 +49,8 @@ function! s:BufStopSelectBuffer(k)
         let s:bufnr = b.bufno
       endif
     endfor
+    " move cursor on the selected line
+    exe keyno+1
   else
     let s:bufnr = s:allbufs[line('.')-1].bufno
   endif
@@ -69,9 +71,10 @@ function! s:BufStopSelectBuffer(k)
 endfunction
 
 function! s:MapKeys()
-  nnoremap <buffer> <silent> <Esc>   :q<cr><C-w>p
-  nnoremap <buffer> <silent> <cr>    :call <SID>BufStopSelectBuffer('cr')<cr>
-  nnoremap <buffer> <silent> d       :call <SID>BufStopSelectBuffer('d')<cr>
+  nnoremap <buffer> <silent> <Esc>            :q<cr><C-w>p
+  nnoremap <buffer> <silent> <cr>             :call <SID>BufStopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufStopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> d                :call <SID>BufStopSelectBuffer('d')<cr>
 
   for buf in s:allbufs
     exe "nnoremap <buffer> <silent> ". buf.key. "   :call <SID>BufStopSelectBuffer('" . buf.key . "')<cr>"
@@ -82,14 +85,13 @@ function! s:GetBufferInfo()
   let s:allbufs = []
   let [s:allbufs, allwidths] = [[], {}]
 
-  for n in keys(s:types)
+  for n in s:types
     let allwidths[n] = []
   endfor
  
   let k = 0
 
   let bu_li = split(s:lsoutput, '\n')
-  let g:Cacamaca = copy(bu_li)
   call sort(bu_li, "<SID>BufstopMRUCmp")
 
   for buf in bu_li
@@ -112,14 +114,14 @@ function! s:GetBufferInfo()
 
     call add(s:allbufs, b)
 
-    for n in keys(s:types)
+    for n in s:types
       call add(allwidths[n], len(b[n]))
     endfor
   endfor
 
-  let [s:allpads] = [{}]
+  let s:allpads = {}
 
-  for n in keys(s:types)
+  for n in s:types
     let s:allpads[n] = repeat(' ', max(allwidths[n]))
   endfor
 
@@ -135,17 +137,22 @@ function! Bufstop()
   let bufdata = s:GetBufferInfo()
 
   for buf in bufdata
-    let line = "  " . buf.key . "   "
+    let line = ''
+    if buf.key ==# 'X'
+      let line = "  " . " " . "   "
+    else
+      let line = "  " . buf.key . "   "
+    endif
 
     let path = buf["path"]
     let pad = s:allpads.shortname
 
-    let line .= buf.shortname."  ".strpart(pad.path, len(buf.shortname))
+    let line .= buf.shortname . "  " . strpart(pad . path, len(buf.shortname))
     
     call add(lines, line)
   endfor
   
-  exe "botright " . len(lines) . " split"
+  exe "botright " . min([len(lines), 20]) . " split"
 
   if s:local_bufnr < 0
     exe "silent e ".s:name
@@ -155,6 +162,8 @@ function! Bufstop()
   endif
   
   setlocal modifiable
+  exe 'setlocal statusline=Bufstop:\ ' . len(lines) . '\ buffers'
+  exe "normal ggdG"
   call setline(1, lines)
   setlocal nomodifiable
 
