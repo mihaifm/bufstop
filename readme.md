@@ -1,11 +1,9 @@
 ##Bufstop
 
-Bufstop is a plugin for fast buffer switching, built for efficiency and less keystrokes.
+**Bufstop** is a plugin for fast buffer switching, built for efficiency and less keystrokes.
 
 Here is a **[short demo](http://www.youtube.com/watch?v=IwZSI-ZEoUY)** and 
 **[screenshot](https://raw.github.com/mihaifm/bufstop/master/screen.png)**
-
-**Bufstop** is a plugin for fast buffer switching, built for efficiency and less keystrokes.
 
 It provides a `:Bufstop` command that opens a new window at the bottom of the 
 screen containing the list of current buffers (ordered by most recently used).
