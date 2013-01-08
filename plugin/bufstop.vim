@@ -163,7 +163,10 @@ function! Bufstop()
   
   setlocal modifiable
   exe 'setlocal statusline=Bufstop:\ ' . len(lines) . '\ buffers'
-  exe "normal ggdG"
+  " delete evertying in the buffer
+  " (can't use 'normal ggdG' since the keys are remapped)
+  exe 'goto'
+  exe '%delete'
   call setline(1, lines)
   setlocal nomodifiable
 
@@ -283,4 +286,3 @@ augroup End
 command! Bufstop :call Bufstop()
 command! BufstopBack :call <SID>BufstopBack()
 command! BufstopForward :call <SID>BufstopForward()
-
