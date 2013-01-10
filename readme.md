@@ -17,6 +17,10 @@ less key strokes to open a buffer than other plugins.
 
 The **Bufstop** window is easily dismissed with the `<Esc>` key.
 
+There is also a `:BufstopFast` command which opens the **Bufstop** window in the same way,
+but spares you the effort of pressing the `<Esc>` key : the window closes automatically after
+you select a buffer.
+
 This plugin also provides navigation history for each window. Use the 
 `:BufstopForward` and `:BufstopBack` commands to quickly navigate the buffers
 in the order they were opened.
@@ -37,6 +41,10 @@ This plugin provides the following commands:
 
 Invokes the `Bufstop` window. Inside it, each buffer will have an associated 
 hotkey that can be used to open the buffer. 
+
+    :BufstopFast
+
+Same as `:Bufstop`, but the window is closed after you select a buffer.    
 
 In addition, the following key mappings are present in the `Bufstop` window:
 

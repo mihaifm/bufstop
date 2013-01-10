@@ -10,6 +10,7 @@ let s:types = ["fullname", "path", "shortname"]
 let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"
 let s:keys = split(s:keystr, '\zs')
 let s:local_bufnr = -1
+let s:fast_mode = 0
 
 let g:Bufstop_history = []
 
@@ -64,8 +65,12 @@ function! s:BufStopSelectBuffer(k)
       setlocal nomodifiable
     else
       exe "wincmd p"
-      exec "keepalt keepjumps silent b" s:bufnr
+      exe "keepalt keepjumps silent b" s:bufnr
       exe "wincmd p"
+      if s:fast_mode
+        exe "q"
+        exe "wincmd p"
+      endif
     endif
   endif
 endfunction
@@ -126,6 +131,16 @@ function! s:GetBufferInfo()
   endfor
 
   return s:allbufs
+endfunction
+
+function! BufstopSlow()
+  let s:fast_mode = 0
+  call Bufstop()
+endfunction
+
+function!BufstopFast()
+  let s:fast_mode = 1
+  call Bufstop()
 endfunction
 
 function! Bufstop()
@@ -290,6 +305,7 @@ augroup Bufstop
 augroup End
 
 
-command! Bufstop :call Bufstop()
+command! Bufstop :call BufstopSlow()
+command! BufstopFast :call BufstopFast()
 command! BufstopBack :call <SID>BufstopBack()
 command! BufstopForward :call <SID>BufstopForward()
