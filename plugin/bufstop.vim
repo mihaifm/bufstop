@@ -129,6 +129,13 @@ function! s:GetBufferInfo()
 endfunction
 
 function! Bufstop()
+  let bufstop_winnr = bufwinnr(s:name)
+  if bufstop_winnr != -1
+    exe bufstop_winnr . "wincmd w"
+    exe "q"
+    return
+  endif
+
   redir => s:lsoutput 
   exe "silent ls"
   redir END
