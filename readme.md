@@ -70,7 +70,7 @@ in your `vimrc`:
 
     let g:BufstopSpeedKeys = ["<F1>", "<F2>", "<F3>", "<F4>", "<F5>", "<F6>"]
     let g:BufstopLeader = ""
-    call BufstopSpeedToggle()
+    let g:BufstopAutoSpeedToggle = 1
 
 Yes, you guessed it. __*1 key to open arbitrary buffers*__ !
 
@@ -100,7 +100,7 @@ mappings or create your own:
     map <leader>a :BufstopModeFast<CR>     " a command for quick switching
     map <C-tab>   :BufstopBack<CR>
     map <S-tab>   :BufstopForward<CR>
-    call BufstopSpeedToggle()              " now I can press ,3,3,3 to cycle the last 3 buffers
+    let g:BufstopAutoSpeedToggle = 1       " now I can press ,3,3,3 to cycle the last 3 buffers
 
 ##Don't like this plugin?
 
@@ -183,3 +183,8 @@ Default: `"<leader>"`
 * `g:BufstopModeNumFiles`
 
 The number of files to be displayed in the bufstop mode. Default is 8.
+
+* `g:BufstopAutoSpeedToggle`
+
+Mount the speed mappings automatically when loading the plugin. Default is 0.
+

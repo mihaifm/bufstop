@@ -29,6 +29,10 @@ if !exists("g:BufstopModeNumFiles")
   let g:BufstopModeNumFiles = 8
 endif
 
+if !exists("g:BufstopAutoSpeedToggle")
+  let g:BufstopAutoSpeedToggle = 0
+endif
+
 let g:Bufstop_history = []
 
 " truncate long file names
@@ -348,7 +352,7 @@ function! BufstopSwitchTo(bufidx)
   call filter(g:Bufstop_history, "buflisted(v:val)")
 
   if a:bufidx >= len(g:Bufstop_history)
-    if a:bufidx >= len(s:allbufs)
+    if !exists("s:allbufs") || a:bufidx >= len(s:allbufs)
       call s:BufstopEcho("outside range")
       if s:bufstop_mode_on
         redraw
@@ -559,3 +563,7 @@ command! BufstopMode :call <SID>BufstopModeStart()
 command! BufstopModeFast :call <SID>BufstopModeFastStart()
 command! BufstopStatusline :call <SID>BufstopStatusline()
 command! BufstopStatuslineFast :call <SID>BufstopStatuslineFast()
+
+if g:BufstopAutoSpeedToggle
+  call BufstopSpeedToggle()
+endif

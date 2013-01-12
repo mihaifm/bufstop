@@ -77,7 +77,7 @@ Too much? Put this in your |vimrc|:
 >
     let g:BufstopSpeedKeys = ["<F1>", "<F2>", "<F3>", "<F4>", "<F5>", "<F6>"]
     let g:BufstopLeader = ""
-    call BufstopSpeedToggle()
+    let g:BufstopAutoSpeedToggle = 1
 
 Yes, you guessed it. 1 key to open arbitrary buffers!
 
@@ -103,7 +103,7 @@ mappings or create your own:
     map <leader>a :BufstopModeFast<CR> 
     map <C-tab>   :BufstopBack<CR>
     map <S-tab>   :BufstopForward<CR>
-    call BufstopSpeedToggle()        
+    let g:BufstopAutoSpeedToggle = 1        
 
 ==============================================================================
 1. COMMANDS                                                 *bufstop-commands*
@@ -175,8 +175,10 @@ Default:
 >
     "<leader>"
 
-|g:BufstopModeNumFiles|
+|g:BufstopModeNumFiles|                                      *g:BufstopModeNumFiles*
 
 The number of files to be displayed in the |bufstop-mode|. Default is 8.
 
+|g:BufstopAutoSpeedToggle|                                *g:BufstopAutoSpeedToggle*
 
+Mount the speed mappings automatically when loading the plugin. Default is 0.
