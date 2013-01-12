@@ -3,7 +3,7 @@
 If you find yourself frequently switching back and forth between files, and looking for 
 a faster way to do it, well, your journey has come to an end. Welcome to the **Bufstop** !
 
-**Bufstop** is a plugin for faster buffer switching, build for efficiency and less keystrokes.
+**Bufstop** is a plugin for faster buffer switching, built for efficiency and less keystrokes.
 It provides no less than 6 ways to display and switch buffers.
 
 Here are some **[screenshots](https://github.com/mihaifm/bufstop/tree/master/img)** and a
