@@ -1,8 +1,8 @@
-if exists('g:Bufstop_loaded') 
+if exists('g:loaded_bufstop') 
   finish
 endif
 
-let g:Bufstop_loaded = 1
+let g:loaded_bufstop = 1
 
 let s:name = "--Bufstop--"
 let s:lsoutput = ""
@@ -11,9 +11,45 @@ let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"
 let s:keys = split(s:keystr, '\zs')
 let s:local_bufnr = -1
 let s:fast_mode = 0
+let s:speed_mounted = 0
+let s:bufstop_mode_on = 0
+let s:bufstop_mode_fast = 0
+let s:bufstop_mode_first_call = 1
+let s:use_statusline = 0
+
+if !exists("g:BufstopSpeedKeys")
+  let g:BufstopSpeedKeys = ["1", "2", "3", "4", "5", "6"]
+endif
+
+if !exists("g:BufstopLeader")
+  let g:BufstopLeader = "<leader>"
+endif
+
+if !exists("g:BufstopModeNumFiles")
+  let g:BufstopModeNumFiles = 8
+endif
 
 let g:Bufstop_history = []
 
+" truncate long file names
+function! s:truncate(str)
+  let threshhold = 20
+  if s:use_statusline
+    let threshhold = (winwidth(0) - (g:BufstopModeNumFiles - 1) * 4) / g:BufstopModeNumFiles
+  else
+    let c = &columns
+    let threshhold = (c - (g:BufstopModeNumFiles - 1) * 4) / g:BufstopModeNumFiles
+  endif
+  let g:Threshhold = threshhold
+  if strlen(a:str) >= threshhold
+    let retval = strpart(a:str, 0, threshhold - 2) . ".."
+    return retval
+  else
+    return a:str
+  end
+endfunction
+
+" set properties for the Bufstop window
 function! s:SetProperties()
   setlocal nonumber
   setlocal foldcolumn=0
@@ -34,7 +70,8 @@ function! s:SetProperties()
   endif
 endfunction
 
-function! s:BufStopSelectBuffer(k)
+" select a buffer from the Bufstop window
+function! s:BufstopSelectBuffer(k)
   let delkey = 0
 
   if (a:k == 'd')
@@ -75,17 +112,19 @@ function! s:BufStopSelectBuffer(k)
   endif
 endfunction
 
+" create mappings for the Bufstop window
 function! s:MapKeys()
   nnoremap <buffer> <silent> <Esc>            :q<cr><C-w>p
-  nnoremap <buffer> <silent> <cr>             :call <SID>BufStopSelectBuffer('cr')<cr>
-  nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufStopSelectBuffer('cr')<cr>
-  nnoremap <buffer> <silent> d                :call <SID>BufStopSelectBuffer('d')<cr>
+  nnoremap <buffer> <silent> <cr>             :call <SID>BufstopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufstopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> d                :call <SID>BufstopSelectBuffer('d')<cr>
 
   for buf in s:allbufs
-    exe "nnoremap <buffer> <silent> ". buf.key. "   :call <SID>BufStopSelectBuffer('" . buf.key . "')<cr>"
+    exe "nnoremap <buffer> <silent> ". buf.key. "   :call <SID>BufstopSelectBuffer('" . buf.key . "')<cr>"
   endfor
 endfunction
 
+" parse buffer list and get relevant info
 function! s:GetBufferInfo()
   let s:allbufs = []
   let [s:allbufs, allwidths] = [[], {}]
@@ -133,16 +172,19 @@ function! s:GetBufferInfo()
   return s:allbufs
 endfunction
 
+" wrapper for Bufstop()
 function! BufstopSlow()
   let s:fast_mode = 0
   call Bufstop()
 endfunction
 
-function!BufstopFast()
+" wrapper for Bufstop()
+function! BufstopFast()
   let s:fast_mode = 1
   call Bufstop()
 endfunction
 
+" main plugin entry point
 function! Bufstop()
   let bufstop_winnr = bufwinnr(s:name)
   if bufstop_winnr != -1
@@ -197,7 +239,7 @@ function! Bufstop()
   call s:MapKeys()
 endfunction
 
-" Open the previous buffer in the navigation history for the current window.
+" open the previous buffer in the navigation history for the current window.
 function s:BufstopBack()
   if (!buflisted(winbufnr(winnr())))
     return
@@ -220,7 +262,7 @@ function s:BufstopBack()
   endif
 endfunction
 
-" Open the next buffer in the navigation history for the current window.
+" open the next buffer in the navigation history for the current window.
 function! s:BufstopForward()
   if (!buflisted(winbufnr(winnr())))
     return
@@ -252,7 +294,7 @@ function! s:BufstopFilt(val, bufnr)
   return a:val
 endfunction
 
-" Add the buffer number to the navigation history for the window
+" add the buffer number to the navigation history for the window
 function! s:BufstopAppend(bufnr)
     if !exists('w:history_index')
       let w:history_index = 0
@@ -270,19 +312,23 @@ function! s:BufstopAppend(bufnr)
     let w:history = insert(w:history, a:bufnr, w:history_index)
 endfunction
 
-" Add the buffer number to the global navigation history 
+" add the buffer number to the global navigation history 
 function! s:BufstopGlobalAppend(bufnr)
+  if (!buflisted(a:bufnr))
+    return
+  endif
   call filter(g:Bufstop_history, 'v:val != '.a:bufnr) 
   call insert(g:Bufstop_history, a:bufnr)
 endfunction
 
-" Echo a message in the Vim status line.
+" echo a message in the Vim status line.
 function! s:BufstopEcho(msg)
   echohl WarningMsg
   echomsg 'Bufstop: ' . a:msg
   echohl None
 endfunction
 
+" MRU compare callback
 function! s:BufstopMRUCmp(line1, line2)
   let i1 = index(g:Bufstop_history, str2nr(a:line1))
   let i2 = index(g:Bufstop_history, str2nr(a:line2))
@@ -297,6 +343,206 @@ function! s:BufstopMRUCmp(line1, line2)
   return  i1 - i2
 endfunction
 
+" switch to a buffer in global history or ls output
+function! BufstopSwitchTo(bufidx)
+  call filter(g:Bufstop_history, "buflisted(v:val)")
+
+  if a:bufidx >= len(g:Bufstop_history)
+    if a:bufidx >= len(s:allbufs)
+      call s:BufstopEcho("outside range")
+      if s:bufstop_mode_on
+        redraw
+        call BufstopMode()
+      endif
+      return
+    else
+      exe "b " . s:allbufs[a:bufidx].bufno
+    endif
+  else
+    exe "b " . g:Bufstop_history[a:bufidx]
+  endif
+
+  if s:bufstop_mode_on && !s:bufstop_mode_fast
+    redraw
+    call BufstopMode()
+  endif
+endfunction
+
+" toggle speed commands
+function! BufstopSpeedToggle()
+  if s:speed_mounted
+    call s:BufstopSpeedUnmount()
+  else
+    call s:BufstopSpeedMount()
+  endif
+endfunction
+
+" mount mappings for speed commands
+function! s:BufstopSpeedMount()
+  if s:speed_mounted
+    call s:BufstopEcho("speed mount already on")
+    return
+  endif
+
+  let s:saved_speed_keys = []
+  let idx = 0 
+  for key in g:BufstopSpeedKeys
+    let combo = g:BufstopLeader . key
+    let maparg = maparg(combo)
+    if (maparg !=# '')
+      call add(s:saved_speed_keys, {'key': combo, 'mapping': maparg})
+    endif
+
+    exe "nmap <silent> " . combo . " " . ":call BufstopSwitchTo(" . idx . ")<CR>"
+    let idx += 1
+  endfor
+  let s:speed_mounted = 1
+endfunction
+
+" unmout mappings for speed commands and restore the previous mappings
+function! s:BufstopSpeedUnmount()
+  if !s:speed_mounted
+    call s:BufstopEcho("speed mount already off")
+    return
+  endif
+
+  for key in g:BufstopSpeedKeys
+    let combo = g:BufstopLeader . key
+    exe "nunmap <silent> " . combo
+  endfor
+
+  let idx = 0
+  for saving in s:saved_speed_keys
+    exe "nmap <silent> " . saving.key . " " . saving.mapping
+    let idx += 1
+  endfor
+
+  let s:speed_mounted = 0
+endfunction
+
+" statusline wrapper for BufstopMode
+function! s:BufstopStatusline()
+  let s:bufstop_mode_fast = 0
+  let s:use_statusline = 1
+  let s:old_statusline=&statusline
+  call s:BufstopModeInit()
+endfunction
+
+" statusline fast wrapper for BufstopMode
+function! s:BufstopStatuslineFast()
+  let s:use_statusline = 1
+  let s:bufstop_mode_fast = 1
+  let s:old_statusline=&statusline
+  call s:BufstopModeInit()
+endfunction
+
+" start BufstopMode and make it exit fast
+function! s:BufstopModeFastStart()
+  let s:bufstop_mode_fast = 1
+  call s:BufstopModeInit()
+endfunction
+
+" start BufstopMode in preview mode
+function! s:BufstopModeStart()
+  let s:bufstop_mode_fast = 0
+  call s:BufstopModeInit()
+endfunction
+
+" init and start BufstopMode
+function! s:BufstopModeInit()
+  let s:old_cmdheight = &cmdheight
+  let s:old_maxfuncdepth = &maxfuncdepth
+  if !s:use_statusline
+    set cmdheight=2
+  endif
+  set maxfuncdepth=1000
+
+  redraw
+
+  call BufstopMode()
+endfunction
+
+" cleanup and exit BufstopMode
+function! s:BufstopModeStop()
+  let &cmdheight = s:old_cmdheight
+  let &maxfuncdepth = s:old_maxfuncdepth
+  let s:bufstop_mode_fast = 0
+  if s:use_statusline
+    let s:use_statusline = 0
+    let &statusline = s:old_statusline
+  endif
+
+  let s:bufstop_mode_first_call = 1
+endfunction
+
+" entry point for BufstopMode
+function! BufstopMode()
+  redir => s:lsoutput 
+  exe "silent ls"
+  redir END
+
+  let line = ""
+  let bufdata = s:GetBufferInfo()
+  let bufdata = bufdata[0:g:BufstopModeNumFiles-1]
+
+  " calculate initial lenght of line
+  let idx = 1
+  for buffy in bufdata
+    let line = line . buffy.shortname . ":" . idx . "  "
+    let idx += 1
+  endfor
+  let overflow = 0
+  if s:use_statusline
+    let overflow = winwidth(0)
+  else
+    let overflow = &columns
+  endif
+
+  " truncate long file names if necessary
+  if strlen(line) > overflow
+    let line = ""
+    let idx = 1
+    for buffy in bufdata
+      let line = line . s:truncate(buffy.shortname) . ":" . idx . "  "
+      let idx += 1
+    endfor
+  endif
+
+  if s:use_statusline
+    let &statusline = line . "%<"
+    if s:bufstop_mode_first_call
+      let s:bufstop_mode_first_call = 0
+      redraw
+    endif
+
+    echo "(Bufstop)"
+  else
+    " hack - this should avoid the need of a redraw
+    set cmdheight=1
+    set cmdheight=2
+    " endhack
+
+    echo line . "\n" . "(Bufstop)"
+  endif
+
+  let code = getchar()
+  let key = nr2char(code)
+  if key == nr2char(27)
+    let s:bufstop_mode_on = 0
+    call s:BufstopModeStop()
+    return
+  else
+    let s:bufstop_mode_on = 1
+  endif
+  if (str2nr(key) >= 1 && str2nr(key) <= 9)
+    call BufstopSwitchTo(str2nr(key)-1)
+  else
+    call BufstopSwitchTo(1)
+  endif
+
+  call s:BufstopModeStop()
+endfunction
+
 augroup Bufstop
   autocmd!
   autocmd BufEnter * :call s:BufstopAppend(winbufnr(winnr()))
@@ -304,8 +550,12 @@ augroup Bufstop
   autocmd BufWinEnter * :call s:BufstopGlobalAppend(expand('<abuf>') + 0)
 augroup End
 
-
 command! Bufstop :call BufstopSlow()
 command! BufstopFast :call BufstopFast()
+command! BufstopSpeedToggle :call BufstopSpeedToggle()
 command! BufstopBack :call <SID>BufstopBack()
 command! BufstopForward :call <SID>BufstopForward()
+command! BufstopMode :call <SID>BufstopModeStart()
+command! BufstopModeFast :call <SID>BufstopModeFastStart()
+command! BufstopStatusline :call <SID>BufstopStatusline()
+command! BufstopStatuslineFast :call <SID>BufstopStatuslineFast()
