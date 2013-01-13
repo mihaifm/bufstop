@@ -472,6 +472,10 @@ endfunction
 
 " cleanup and exit BufstopMode
 function! s:BufstopModeStop()
+  " clear command line
+  redraw
+  echo ""
+
   let &cmdheight = s:old_cmdheight
   let &maxfuncdepth = s:old_maxfuncdepth
   let s:bufstop_mode_fast = 0
@@ -545,7 +549,9 @@ function! BufstopMode()
   if (str2nr(key) >= 1 && str2nr(key) <= 9)
     call BufstopSwitchTo(str2nr(key)-1)
   else
-    call BufstopSwitchTo(1)
+    if len(bufdata) > 1
+      call BufstopSwitchTo(1)
+    endif
   endif
 
   call s:BufstopModeStop()
