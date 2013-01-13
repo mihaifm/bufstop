@@ -236,6 +236,10 @@ function! Bufstop()
   exe 'goto'
   exe '%delete'
   call setline(1, lines)
+  " set cursor on the alternate buffer by default
+  if len(lines) > 1
+    exe 2
+  endif
   setlocal nomodifiable
 
   call s:SetProperties()
@@ -567,3 +571,4 @@ command! BufstopStatuslineFast :call <SID>BufstopStatuslineFast()
 if g:BufstopAutoSpeedToggle
   call BufstopSpeedToggle()
 endif
+
