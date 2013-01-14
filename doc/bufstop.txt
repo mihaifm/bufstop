@@ -18,14 +18,14 @@ Each buffer has an associated hotkey displayed besides it. When pressed, the
 correspoding buffer is loaded, with the focus remaining in the Bufstop window. 
 This way you can quickly preview buffers with only 1 keystroke !
 
-The Bufstop window is easily dismissed with the `<Esc>` key.
+The Bufstop window is easily dismissed with the <Esc> key.
 
 There is also a |:BufstopFast| command which opens the Bufstop window in the 
-same way, but spares you the effort of pressing the `<Esc>` key : the window 
+same way, but spares you the effort of pressing the <Esc> key : the window 
 closes automatically after you select a buffer.
 
 Note: If you're using the recommended mappings (see below), {,b2} will 
-always take you to the previously opened file (aka *alternate buffer*)
+always take you to the previously opened file (aka alternate buffer)
 
 ==============================================================================
 1. BUFSTOP MODE                                                 *bufstop-mode*
@@ -34,11 +34,11 @@ Don't like a pottentially huge file list popping on the screen?
 Use the |:BufstopMode| command. Buffers will be displayed in the command line, 
 in the same order: by most recently used.
 
-In this mode, you can only press numbers. Pressing *3* will take you to the 
+In this mode, you can only press numbers. Pressing 3 will take you to the 
 3rd recently used buffer. However here's the catch: because the 3rd buffer 
 will now be first in the hierarchy, it's place will be taken by another buffer.   
-So pressing *33333....* will cycle between the last 3 buffers.   
-Similarly, *4444* will cycle the last 4 buffers, and so on.
+So pressing 33333.... will cycle between the last 3 buffers.
+Similarly, 4444 will cycle the last 4 buffers, and so on.
 
 Pressing <Esc> will dismiss the mode. There is a |:BufstopModeFast| alternative, 
 which dismisses the mode once you select a buffer.
@@ -59,15 +59,15 @@ Note: No worries, your old statusline is restored once you exit the mode.
 1. EXTREME SPEED                                                *bufstop-speed*
 
 The previous methods are cool, but they still require a mapping to bring up 
-the buffer list, typically *<leader>b* 
+the buffer list, typically <leader>b
 Looking for a faster way? Use the |:BufstopSpeedToggle| command. 
 
-It creates the following mappings: *<leader>2* opens the previous buffer,
-*<leader>3* to open the 3rd recently used buffer, and so on.
+It creates the following mappings: <leader>2 opens the previous buffer,
+<leader>3 to open the 3rd recently used buffer, and so on.
 
 Using |:BufstopSpeedToggle| again will clear out these mappings.
 
-Note: Pressing *,5,5,5...* will cycle the last 5 buffers.
+Note: Pressing ,5,5,5... will cycle the last 5 buffers.
 
 ==============================================================================
 1. ULTIMATE                                                 *bufstop-ultimate*
@@ -145,8 +145,8 @@ Same as |:BufstopStatusline| but exists the mode once a buffer is selected.
 
 |:BufstopSpeedToggle|                                         *:BufstopSpeedToggle*
 
-Toggle speed mappings. The defaults are *<leader>2* to go to the 2nd recently 
-used buffer, *<leader>3* to go to the 3rd, an so on. These can be configured 
+Toggle speed mappings. The defaults are <leader>2 to go to the 2nd recently 
+used buffer, <leader>3 to go to the 3rd, an so on. These can be configured 
 using the |g:BufstopSpeedKeys| and |g:BufstopLeader| options.
 
 |:BufstopBack|                                                       *:BufstopBack*
@@ -182,3 +182,4 @@ The number of files to be displayed in the |bufstop-mode|. Default is 8.
 |g:BufstopAutoSpeedToggle|                                *g:BufstopAutoSpeedToggle*
 
 Mount the speed mappings automatically when loading the plugin. Default is 0.
+
