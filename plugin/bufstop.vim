@@ -17,6 +17,10 @@ let s:bufstop_mode_fast = 0
 let s:bufstop_mode_first_call = 1
 let s:use_statusline = 0
 
+if !exists("g:BufstopSplit")
+  let g:BufstopSplit = "botright"
+endif
+
 if !exists("g:BufstopSpeedKeys")
   let g:BufstopSpeedKeys = ["1", "2", "3", "4", "5", "6"]
 endif
@@ -220,7 +224,7 @@ function! Bufstop()
     call add(lines, line)
   endfor
   
-  exe "botright " . min([len(lines), 20]) . " split"
+  exe g:BufstopSplit . " " . min([len(lines), 20]) . " split"
 
   if s:local_bufnr < 0
     exe "silent e ".s:name
