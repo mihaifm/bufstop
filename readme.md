@@ -190,9 +190,10 @@ Mount the speed mappings automatically when loading the plugin. Default is 0.
 
 * `g:BufstopSplit`
 
-`:Bufstop` split location in the buffer or window. Default is `"botright"`.
+Location of `Bufstop` split in the buffer or window. Default is `"botright"`.
 
-`"topleft"`    : window horizontal up
-`"botright"`   : window horizontal down
-`"leftabove"`  : buffer horizontal up
-`"rightbelow"` : buffer horizontal down
+    "topleft"    : window horizontal up
+    "botright"   : window horizontal down
+    "leftabove"  : buffer horizontal up
+    "rightbelow" : buffer horizontal down
+
