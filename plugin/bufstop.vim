@@ -238,7 +238,7 @@ function! Bufstop()
   " delete evertying in the buffer
   " (can't use 'normal ggdG' since the keys are remapped)
   exe 'goto'
-  exe '%delete'
+  exe '%delete _'
   call setline(1, lines)
   " set cursor on the alternate buffer by default
   if len(lines) > 1
