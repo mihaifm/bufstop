@@ -191,3 +191,9 @@ Mount the speed mappings automatically when loading the plugin. Default is 0.
     "botright"   : window horizontal down
     "leftabove"  : buffer horizontal up
     "rightbelow" : buffer horizontal down
+
+|g:BufstopDismissKey|                                          *g:BufstopDismissKey*
+
+The key used to close the |:Bufstop| window. Default:
+>
+    "<Esc>"

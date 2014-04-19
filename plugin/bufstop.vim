@@ -37,6 +37,10 @@ if !exists("g:BufstopAutoSpeedToggle")
   let g:BufstopAutoSpeedToggle = 0
 endif
 
+if !exists("g:BufstopDismissKey")
+  let g:BufstopDismissKey = "<Esc>"
+endif
+
 let g:Bufstop_history = []
 
 " truncate long file names
@@ -122,7 +126,7 @@ endfunction
 
 " create mappings for the Bufstop window
 function! s:MapKeys()
-  nnoremap <buffer> <silent> <Esc>            :q<cr><C-w>p
+  exe "nnoremap <buffer> <silent> " . g:BufstopDismissKey . " :q<cr><C-w>p"
   nnoremap <buffer> <silent> <cr>             :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> d                :call <SID>BufstopSelectBuffer('d')<cr>
