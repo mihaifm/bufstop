@@ -7,14 +7,11 @@ let g:loaded_bufstop = 1
 let s:name = "--Bufstop--"
 let s:lsoutput = ""
 let s:types = ["fullname", "path", "shortname"]
-let s:keystr = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"
-let s:keys = split(s:keystr, '\zs')
 let s:local_bufnr = -1
 let s:fast_mode = 0
 let s:speed_mounted = 0
 let s:bufstop_mode_on = 0
 let s:bufstop_mode_fast = 0
-let s:bufstop_mode_first_call = 1
 let s:use_statusline = 0
 
 if !exists("g:BufstopSplit")
@@ -41,6 +38,13 @@ if !exists("g:BufstopDismissKey")
   let g:BufstopDismissKey = "<Esc>"
 endif
 
+if !exists("g:BufstopKeys")
+  let g:BufstopKeys = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"
+endif
+
+let s:keystr = g:BufstopKeys
+let s:keys = split(s:keystr, '\zs')
+
 let g:Bufstop_history = []
 
 " truncate long file names
@@ -49,12 +53,17 @@ function! s:truncate(str)
   if s:use_statusline
     let threshhold = (winwidth(0) - (g:BufstopModeNumFiles - 1) * 4) / g:BufstopModeNumFiles
   else
-    let c = &columns
+    let c = 0
+    if s:bufstop_mode_fast
+      let c = &columns - 8
+    else
+      let c = &columns
+    endif
+
     let threshhold = (c - (g:BufstopModeNumFiles - 1) * 4) / g:BufstopModeNumFiles
   endif
-  let g:Threshhold = threshhold
   if strlen(a:str) >= threshhold
-    let retval = strpart(a:str, 0, threshhold - 2) . ".."
+    let retval = strpart(a:str, 0, threshhold)
     return retval
   else
     return a:str
@@ -466,13 +475,8 @@ endfunction
 
 " init and start BufstopMode
 function! s:BufstopModeInit()
-  let s:old_cmdheight = &cmdheight
   let s:old_maxfuncdepth = &maxfuncdepth
-  if !s:use_statusline
-    set cmdheight=2
-  endif
   set maxfuncdepth=1000
-
   redraw
 
   call BufstopMode()
@@ -484,15 +488,13 @@ function! s:BufstopModeStop()
   redraw
   echo ""
 
-  let &cmdheight = s:old_cmdheight
   let &maxfuncdepth = s:old_maxfuncdepth
   let s:bufstop_mode_fast = 0
+  let s:bufstop_mode_on = 0
   if s:use_statusline
     let s:use_statusline = 0
     let &statusline = s:old_statusline
   endif
-
-  let s:bufstop_mode_first_call = 1
 endfunction
 
 " entry point for BufstopMode
@@ -508,41 +510,27 @@ function! BufstopMode()
   " calculate initial lenght of line
   let idx = 1
   for buffy in bufdata
-    let line = line . buffy.shortname . ":" . idx . "  "
+    let line = line . buffy.shortname . ":" . s:keystr[idx - 1] . "  "
+    if !s:use_statusline
+      echohl Identifier
+      echon " " . s:truncate(buffy.shortname)
+      echohl None
+
+      echon ":"
+
+      echohl String
+      echon s:keystr[idx - 1]
+      echohl None
+    endif
+
     let idx += 1
   endfor
   let overflow = 0
-  if s:use_statusline
-    let overflow = winwidth(0)
-  else
-    let overflow = &columns
-  endif
-
-  " truncate long file names if necessary
-  if strlen(line) > overflow
-    let line = ""
-    let idx = 1
-    for buffy in bufdata
-      let line = line . s:truncate(buffy.shortname) . ":" . idx . "  "
-      let idx += 1
-    endfor
-  endif
 
   if s:use_statusline
     let &statusline = line . "%<"
-    if s:bufstop_mode_first_call
-      let s:bufstop_mode_first_call = 0
-      redraw
-    endif
-
+    redraw
     echo "(Bufstop)"
-  else
-    " hack - this should avoid the need of a redraw
-    set cmdheight=1
-    set cmdheight=2
-    " endhack
-
-    echo line . "\n" . "(Bufstop)"
   endif
 
   let code = getchar()
@@ -554,13 +542,8 @@ function! BufstopMode()
   else
     let s:bufstop_mode_on = 1
   endif
-  if (str2nr(key) >= 1 && str2nr(key) <= 9)
-    call BufstopSwitchTo(str2nr(key)-1)
-  else
-    if len(bufdata) > 1
-      call BufstopSwitchTo(1)
-    endif
-  endif
+
+  call BufstopSwitchTo(strridx(s:keystr, key))
 
   call s:BufstopModeStop()
 endfunction

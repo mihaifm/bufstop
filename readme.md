@@ -80,11 +80,6 @@ Once again, pressing `<F4><F4><F4>...` will cycle between the last 4 buffer.
 these mapping. Bufstop will attempt to restore your old mapping (given that you didn't use
 `noremap`).
 
-##Is there...a faster way?
-
-Perhaps, using brain-wired electrodes, so that you wouldn't have to type anything.
-Seriously now, got other ideas on how to switch buffers? Open up an issue.
-
 ##Bonus
 
 As a bonus, this plugin provides __*navigation history for each window*__. 
