@@ -164,6 +164,12 @@ Opens the next buffer in the navigation history for the current window.
 
 ####Config
 
+* `g:BufstopKeys`
+
+The shortcut keys used to switch buffers. The keys are displayed next to the
+buffer names, in the order they appear in this string.
+Default: `"1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"`
+
 * `g:BufstopSpeedKeys`
 
 Keys used to create speed mappings. The `g:BufstopLeader` will be appended to
