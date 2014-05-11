@@ -145,6 +145,14 @@ function! s:MapKeys()
   endfor
 endfunction
 
+function! BufstopGetBufferInfo()
+    redir => s:lsoutput
+    exe "silent ls"
+    redir END
+
+    return s:GetBufferInfo()
+endfunction
+
 " parse buffer list and get relevant info
 function! s:GetBufferInfo()
   let s:allbufs = []
