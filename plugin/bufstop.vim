@@ -47,6 +47,11 @@ let s:keys = split(s:keystr, '\zs')
 
 let g:Bufstop_history = []
 
+if has("syntax")
+  hi def link bufstopKey String
+  hi def link bufstopName Type
+end
+
 " truncate long file names
 function! s:truncate(str)
   let threshhold = 20
@@ -85,9 +90,6 @@ function! s:SetProperties()
   if has("syntax")
     syn match bufstopKey /\v^\s\s(\d|\a|\s)/ contained
     syn match bufstopName /\v^\s\s(\d|\a|\s)\s+.+\s\s/ contains=bufstopKey
-   
-    hi def link bufstopKey String
-    hi def link bufstopName Type
   endif
 endfunction
 
@@ -520,13 +522,13 @@ function! BufstopMode()
   for buffy in bufdata
     let line = line . buffy.shortname . ":" . s:keystr[idx - 1] . "  "
     if !s:use_statusline
-      echohl Identifier
+      echohl bufstopName
       echon " " . s:truncate(buffy.shortname)
       echohl None
 
       echon ":"
 
-      echohl String
+      echohl bufstopKey
       echon s:keystr[idx - 1]
       echohl None
     endif
