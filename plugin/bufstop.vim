@@ -558,7 +558,7 @@ function! BufstopMode()
       let to_output = buffy.shortname
     endif
 
-    echohl Identifier
+    echohl bufstopName
     echon " " . to_output
     let line = line . " " . to_output
     echohl None
@@ -566,7 +566,7 @@ function! BufstopMode()
     echon ":"
     let line .= ":"
 
-    echohl String
+    echohl bufstopKey
     echon s:keystr[idx]
     let line .= s:keystr[idx]
     echohl None
