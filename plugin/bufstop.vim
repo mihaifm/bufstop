@@ -13,6 +13,7 @@ let s:speed_mounted = 0
 let s:bufstop_mode_on = 0
 let s:bufstop_mode_fast = 0
 let s:use_statusline = 0
+let s:frequency_map = {}
 
 if !exists("g:BufstopSplit")
   let g:BufstopSplit = "botright"
@@ -42,28 +43,26 @@ if !exists("g:BufstopKeys")
   let g:BufstopKeys = "1234asfcvzx5qwertyuiopbnm67890ABCEFGHIJKLMNOPQRSTUVZ"
 endif
 
+if !exists("g:BufstopSorting")
+  let g:BufstopSorting = "MFU"
+endif
+
 let s:keystr = g:BufstopKeys
 let s:keys = split(s:keystr, '\zs')
 
 let g:Bufstop_history = []
 
 " truncate long file names
-function! s:truncate(str)
+function! s:truncate(str, numfiles)
   let threshhold = 20
   if s:use_statusline
-    let threshhold = (winwidth(0) - (g:BufstopModeNumFiles - 1) * 4) / g:BufstopModeNumFiles
+    let threshhold = winwidth(0) / a:numfiles
   else
-    let c = 0
-    if s:bufstop_mode_fast
-      let c = &columns - 8
-    else
-      let c = &columns
-    endif
-
-    let threshhold = (c - (g:BufstopModeNumFiles - 1) * 4) / g:BufstopModeNumFiles
+    let threshhold = &columns / a:numfiles
   endif
-  if strlen(a:str) >= threshhold
-    let retval = strpart(a:str, 0, threshhold)
+
+  if strlen(a:str) + 3 >= threshhold
+    let retval = strpart(a:str, 0, threshhold - 3)
     return retval
   else
     return a:str
@@ -157,7 +156,12 @@ function! s:GetBufferInfo()
   let k = 0
 
   let bu_li = split(s:lsoutput, '\n')
-  call sort(bu_li, "<SID>BufstopMRUCmp")
+
+  if g:BufstopSorting == "MRU"
+    call sort(bu_li, "<SID>BufstopMRUCmp")
+  elseif g:BufstopSorting == "MFU"
+    call sort(bu_li, "<SID>BufstopMFUCmp")
+  endif
 
   for buf in bu_li
     let bits = split(buf, '"')
@@ -232,6 +236,7 @@ function! Bufstop()
     let path = buf["path"]
     let pad = s:allpads.shortname
 
+    " let shortn = fnamemodify(buf.shortname, ":r")
     let line .= buf.shortname . "  " . strpart(pad . path, len(buf.shortname))
     
     call add(lines, line)
@@ -344,6 +349,12 @@ function! s:BufstopGlobalAppend(bufnr)
   endif
   call filter(g:Bufstop_history, 'v:val != '.a:bufnr) 
   call insert(g:Bufstop_history, a:bufnr)
+
+  if !has_key(s:frequency_map, a:bufnr)
+    let s:frequency_map[a:bufnr] = 1
+  else
+    let s:frequency_map[a:bufnr] += 1
+  endif
 endfunction
 
 " echo a message in the Vim status line.
@@ -368,6 +379,21 @@ function! s:BufstopMRUCmp(line1, line2)
   return  i1 - i2
 endfunction
 
+" MFU compare callback
+function! s:BufstopMFUCmp(line1, line2)
+  let i1 = 0
+  let i2 = 0
+
+  if has_key(s:frequency_map, str2nr(a:line1))
+    let i1 = s:frequency_map[str2nr(a:line1)]
+  endif
+  if has_key(s:frequency_map, str2nr(a:line2))
+    let i2 = s:frequency_map[str2nr(a:line2)]
+  endif
+
+  return  i2 - i1
+endfunction
+
 " switch to a buffer in global history or ls output
 function! BufstopSwitchTo(bufidx)
   call filter(g:Bufstop_history, "buflisted(v:val)")
@@ -375,21 +401,12 @@ function! BufstopSwitchTo(bufidx)
   if a:bufidx >= len(g:Bufstop_history)
     if !exists("s:allbufs") || a:bufidx >= len(s:allbufs)
       call s:BufstopEcho("outside range")
-      if s:bufstop_mode_on
-        redraw
-        call BufstopMode()
-      endif
       return
     else
       exe "b " . s:allbufs[a:bufidx].bufno
     endif
   else
     exe "b " . g:Bufstop_history[a:bufidx]
-  endif
-
-  if s:bufstop_mode_on && !s:bufstop_mode_fast
-    redraw
-    call BufstopMode()
   endif
 endfunction
 
@@ -507,25 +524,45 @@ function! BufstopMode()
   let bufdata = s:GetBufferInfo()
   let bufdata = bufdata[0:g:BufstopModeNumFiles-1]
 
-  " calculate initial lenght of line
-  let idx = 1
+  " calculate initial length of line
+  let line_len = 0
   for buffy in bufdata
-    let line = line . buffy.shortname . ":" . s:keystr[idx - 1] . "  "
-    if !s:use_statusline
-      echohl Identifier
-      echon " " . s:truncate(buffy.shortname)
-      echohl None
+    let line_len += strlen(buffy.shortname)
+    let line_len += 3
+  endfor
 
-      echon ":"
+  let overflow = 0
+  if s:use_statusline
+    let overflow = winwidth(0)
+  else
+    let overflow = &columns
+  endif
 
-      echohl String
-      echon s:keystr[idx - 1]
-      echohl None
+  let idx = 0
+  let line = ""
+  for buffy in bufdata
+    let to_output = ""
+    if line_len > overflow
+      let to_output = s:truncate(buffy.shortname, len(bufdata))
+    else
+      let to_output = buffy.shortname
     endif
+
+    echohl Identifier
+    echon " " . to_output
+    let line = line . " " . to_output
+    echohl None
+
+    echon ":"
+    let line .= ":"
+
+    echohl String
+    echon s:keystr[idx]
+    let line .= s:keystr[idx]
+    echohl None
 
     let idx += 1
   endfor
-  let overflow = 0
 
   if s:use_statusline
     let &statusline = line . "%<"
@@ -543,7 +580,20 @@ function! BufstopMode()
     let s:bufstop_mode_on = 1
   endif
 
-  call BufstopSwitchTo(strridx(s:keystr, key))
+  let bufnr = 0
+  for b in bufdata
+    if b.key == key
+      let bufnr = b.bufno
+    endif
+  endfor
+  if bufexists(bufnr)
+    exe "keepalt keepjumps silent b" bufnr
+  endif
+
+  if !s:bufstop_mode_fast
+    redraw
+    call BufstopMode()
+  endif
 
   call s:BufstopModeStop()
 endfunction
