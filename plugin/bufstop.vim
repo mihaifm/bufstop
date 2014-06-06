@@ -52,6 +52,11 @@ let s:keys = split(s:keystr, '\zs')
 
 let g:Bufstop_history = []
 
+if has("syntax")
+  hi def link bufstopKey String
+  hi def link bufstopName Type
+end
+
 " truncate long file names
 function! s:truncate(str, numfiles)
   let threshhold = 20
@@ -84,9 +89,6 @@ function! s:SetProperties()
   if has("syntax")
     syn match bufstopKey /\v^\s\s(\d|\a|\s)/ contained
     syn match bufstopName /\v^\s\s(\d|\a|\s)\s+.+\s\s/ contains=bufstopKey
-   
-    hi def link bufstopKey String
-    hi def link bufstopName Type
   endif
 endfunction
 
@@ -142,6 +144,14 @@ function! s:MapKeys()
   for buf in s:allbufs
     exe "nnoremap <buffer> <silent> ". buf.key. "   :call <SID>BufstopSelectBuffer('" . buf.key . "')<cr>"
   endfor
+endfunction
+
+function! BufstopGetBufferInfo()
+    redir => s:lsoutput
+    exe "silent ls"
+    redir END
+
+    return s:GetBufferInfo()
 endfunction
 
 " parse buffer list and get relevant info
