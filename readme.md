@@ -6,7 +6,9 @@ a faster way to do it, well...your journey has come to an end. Welcome to the **
 **Bufstop** is a plugin for faster buffer switching, built for efficiency and less keystrokes.
 It provides no less than 6 ways to display and switch buffers.
 
-Here are some **[screenshots](https://github.com/mihaifm/bufstop/tree/master/img)**.
+![screenshot1](https://cloud.githubusercontent.com/assets/981184/3208138/651a0f36-ee1c-11e3-9a40-5191fdcab2df.png)
+
+![screenshot2](https://cloud.githubusercontent.com/assets/981184/3208142/0306711c-ee1d-11e3-9121-0bfad5d43909.png)
 
 ###Elegant and fast
 
@@ -84,8 +86,8 @@ these mappings. Bufstop will attempt to restore your old mapping (given that you
 As a bonus, this plugin provides __*navigation history for each window*__.    
 Use the `:BufstopBack` and `:BufstopForward` to navigate this history.
 
-The other bonus is the ability to sort the buffers by **MFU (most frequently
-used)**. Use the `g:BufstopSorting` option to activate this powerful feature.
+The other bonus is the ability to sort the buffers by __*MFU (most frequently
+used)*__. Use the `g:BufstopSorting` option to activate this powerful feature.
 
 ###Recommended mappings
 
@@ -202,3 +204,4 @@ Controls the way buffers are sorted before being displayed. Valid options are:
 
 Default: `"MRU"`
 
+More options with `:help Bufstop`
