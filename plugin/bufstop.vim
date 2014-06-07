@@ -44,7 +44,7 @@ if !exists("g:BufstopKeys")
 endif
 
 if !exists("g:BufstopSorting")
-  let g:BufstopSorting = "MFU"
+  let g:BufstopSorting = "MRU"
 endif
 
 let s:keystr = g:BufstopKeys

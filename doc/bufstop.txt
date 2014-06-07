@@ -1,4 +1,4 @@
-*bufstop.txt*        version 1.3.0
+*bufstop.txt*        version 1.4.0
 
 *Bufstop*
 
@@ -6,7 +6,7 @@
 1. INTRO                                                      *bufstop-intro*
 
 If you find yourself frequently switching back and forth between files, and 
-looking for a faster way to do it, well, your journey has come to an end. 
+looking for a faster way to do it, well...your journey has come to an end. 
 Welcome to the |Bufstop| !
 
 |Bufstop| is a plugin for faster buffer switching, built for efficiency and

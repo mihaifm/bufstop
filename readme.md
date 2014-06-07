@@ -1,7 +1,7 @@
 ##Bufstop
 
 If you find yourself frequently switching back and forth between files, and looking for 
-a faster way to do it, well, your journey has come to an end. Welcome to the **Bufstop** !
+a faster way to do it, well...your journey has come to an end. Welcome to the **Bufstop** !
 
 **Bufstop** is a plugin for faster buffer switching, built for efficiency and less keystrokes.
 It provides no less than 6 ways to display and switch buffers.
@@ -79,11 +79,13 @@ Once again, pressing `<F4><F4><F4>...` will cycle between the last 4 buffers.
 these mappings. Bufstop will attempt to restore your old mapping (given that you didn't use
 `noremap`).
 
-###Bonus
+###Bonuses
 
-As a bonus, this plugin provides __*navigation history for each window*__. 
-
+As a bonus, this plugin provides __*navigation history for each window*__.    
 Use the `:BufstopBack` and `:BufstopForward` to navigate this history.
+
+The other bonus is the ability to sort the buffers by **MFU (most frequently
+used)**. Use the `g:BufstopSorting` option to activate this powerful feature.
 
 ###Recommended mappings
 
