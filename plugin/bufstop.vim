@@ -103,14 +103,17 @@ function! s:BufstopSelectBuffer(k)
   let keyno = strridx(s:keystr, a:k) 
   let s:bufnr = -1
 
+  let pos = 0
   if (keyno >= 0 && !delkey)
     for b in s:allbufs
-      if b.key == a:k
+      let pos += 1
+      if b.key ==# a:k
         let s:bufnr = b.bufno
+        break
       endif
     endfor
     " move cursor on the selected line
-    exe keyno+1
+    exe pos
   else
     let s:bufnr = s:allbufs[line('.')-1].bufno
   endif
@@ -592,7 +595,7 @@ function! BufstopMode()
 
   let bufnr = 0
   for b in bufdata
-    if b.key == key
+    if b.key ==# key
       let bufnr = b.bufno
     endif
   endfor
@@ -608,11 +611,22 @@ function! BufstopMode()
   call s:BufstopModeStop()
 endfunction
 
+function s:TimeoutFiddle(on_off)
+  if a:on_off == 1
+    let s:old_timeoutlen = &timeoutlen
+    let &timeoutlen = 10
+  else
+    let &timeoutlen = s:old_timeoutlen
+  end
+endfunction
+
 augroup Bufstop
   autocmd!
   autocmd BufEnter * :call s:BufstopAppend(winbufnr(winnr()))
   autocmd WinEnter * :call s:BufstopAppend(winbufnr(winnr()))
   autocmd BufWinEnter * :call s:BufstopGlobalAppend(expand('<abuf>') + 0)
+  exe "autocmd BufWinEnter,WinEnter " . s:name . " :call s:TimeoutFiddle(1)"
+  exe "autocmd BufWinLeave,WinLeave " . s:name . " :call s:TimeoutFiddle(0)"
 augroup End
 
 command! Bufstop :call BufstopSlow()
