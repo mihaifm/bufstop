@@ -127,7 +127,7 @@ function! s:BufstopSelectBuffer(k)
       setlocal nomodifiable
     else
       exe "wincmd p"
-      exe "keepalt keepjumps silent b" s:bufnr
+      exe "silent b" s:bufnr
       exe "wincmd p"
       if s:fast_mode
         exe "q"
@@ -600,7 +600,7 @@ function! BufstopMode()
     endif
   endfor
   if bufexists(bufnr)
-    exe "keepalt keepjumps silent b" bufnr
+    exe "silent b" bufnr
   endif
 
   if !s:bufstop_mode_fast
