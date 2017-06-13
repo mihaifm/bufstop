@@ -1,4 +1,4 @@
-##Bufstop
+## Bufstop
 
 If you find yourself frequently switching back and forth between files, and looking for 
 a faster way to do it, well...your journey has come to an end. Welcome to the **Bufstop** !
@@ -10,7 +10,7 @@ It provides no less than 6 ways to display and switch buffers.
 
 ![screenshot2](https://cloud.githubusercontent.com/assets/981184/3208142/0306711c-ee1d-11e3-9121-0bfad5d43909.png)
 
-###Elegant and fast
+### Elegant and fast
 
 The `:Bufstop` command opens a new window at the bottom of the screen containing the list of 
 current buffers, ordered by most recently used. Each buffer has an associated hotkey 
@@ -27,7 +27,7 @@ you select a buffer.
 **_Tip:_** If you're using the recommended mappings (see below), `,b2` will always take you to 
 the previously opened file (aka *alternate buffer*)
 
-###Minimal mode
+### Minimal mode
 
 Don't like a pottentially huge file list popping on the screen? Use the `:BufstopMode` command.
 Buffers will be displayed in the command line, in the same order: by most recently used.
@@ -43,7 +43,7 @@ which dismisses the mode once you select a buffer.
 
 **_Tip:_** The first buffer labeled with `1` will always be the current file.
 
-###On the statusline
+### On the statusline
 
 The `:BufstopStatusline` command works the same way as `:BufstopMode`, but displays the buffers
 on the statusline. As before, there is a fast alternative, `:BufstopStatuslineFast` that
@@ -51,7 +51,7 @@ will close the mode once you select something.
 
 **_Tip:_** No worries, your old statusline is restored once you exit the mode.
 
-###Extreme speed
+### Extreme speed
 
 The previous methods are cool, but they still require a mapping to bring up the buffer list
 (typically `<leader>b`).    
@@ -64,7 +64,7 @@ Using `:BufstopSpeedToggle` again will clear out these mappings.
 
 **_Tip:_** Pressing `,5,5,5...` will cycle the last 5 buffers.
 
-###Ultimate
+### Ultimate
 
 The previous speed method requires 2 keys to open any arbitrary buffer. Too much? Put this 
 in your `vimrc`:
@@ -81,7 +81,7 @@ Once again, pressing `<F4><F4><F4>...` will cycle between the last 4 buffers.
 these mappings. Bufstop will attempt to restore your old mapping (given that you didn't use
 `noremap`).
 
-###Bonuses
+### Bonuses
 
 As a bonus, this plugin provides __*navigation history for each window*__.    
 Use the `:BufstopBack` and `:BufstopForward` to navigate this history.
@@ -89,7 +89,7 @@ Use the `:BufstopBack` and `:BufstopForward` to navigate this history.
 The other bonus is the ability to sort the buffers by __*MFU (most frequently
 used)*__. Use the `g:BufstopSorting` option to activate this powerful feature.
 
-###Recommended mappings
+### Recommended mappings
 
 Hopefully we're not crazy to type in those long command names. You can use the below 
 mappings or create your own:
@@ -100,7 +100,7 @@ mappings or create your own:
     map <S-tab>   :BufstopForward<CR>
     let g:BufstopAutoSpeedToggle = 1       " now I can press ,3,3,3 to cycle the last 3 buffers
 
-###Don't like this plugin?
+### Don't like this plugin?
 
 At least put this in your `vimrc`:
 
@@ -112,9 +112,9 @@ when you're dealing with a lot of files.
 In addition to this plugin, you can use a fuzzy finder like 
 [CtrlP](https://github.com/kien/ctrlp.vim), which requires you to type parts of the file name.
 
-###Reference documentation
+### Reference documentation
 
-####Commands:
+#### Commands:
 
 * `:Bufstop`  
 
@@ -165,7 +165,7 @@ Opens the previous buffer in the navigation history for the current window.
 
 Opens the next buffer in the navigation history for the current window.
 
-####Config
+#### Config
 
 * `g:BufstopKeys`
 
