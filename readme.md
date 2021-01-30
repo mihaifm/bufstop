@@ -1,18 +1,20 @@
-## Bufstop
+# Bufstop
 
 If you find yourself frequently switching back and forth between files, and looking for 
 a faster way to do it, well...your journey has come to an end. Welcome to the **Bufstop** !
 
 **Bufstop** is a plugin for faster buffer switching, built for efficiency and less keystrokes.
-It provides no less than 6 ways to display and switch buffers.
+It provides no less than 7 ways to display and switch buffers.
+
+If you can think of faster ways to switch files, let me know and I will include them in the plugin.
 
 ![screenshot1](https://cloud.githubusercontent.com/assets/981184/3208138/651a0f36-ee1c-11e3-9a40-5191fdcab2df.png)
 
 ![screenshot2](https://cloud.githubusercontent.com/assets/981184/3208142/0306711c-ee1d-11e3-9121-0bfad5d43909.png)
 
-### Elegant and fast
+## Buffer window with hotkeys
 
-The `:Bufstop` command opens a new window at the bottom of the screen containing the list of 
+The `:Bufstop` command opens a new window at the top/bottom of the screen containing the list of
 current buffers, ordered by most recently used. Each buffer has an associated hotkey 
 displayed besides it. When pressed, the correspoding buffer
 is loaded, with the focus remaining in the Bufstop window. This way you can quickly preview
@@ -24,10 +26,18 @@ There is also a `:BufstopFast` command which opens the Bufstop window in the sam
 but spares you the effort of pressing the `<Esc>` key : the window closes automatically after
 you select a buffer.
 
-**_Tip:_** If you're using the recommended mappings (see below), `,b2` will always take you to 
+**_Tip:_** If you're using the recommended mappings (see below), `<leader>b2` will always take you to
 the previously opened file (aka *alternate buffer*)
 
-### Minimal mode
+## Preview mode
+
+The `:BufstopPreview` command is similar to the `:Bufstop` command, with the notable difference that you can
+preview and navigate files by moving **up or down** in the window with `j,k` or arrow keys. 
+It is a powerful and instant way to check your files.
+
+**_Tip:_** You can still switch files by pressing the hotkeys associated with them.
+
+## Minimal mode inside the command line
 
 Don't like a pottentially huge file list popping on the screen? Use the `:BufstopMode` command.
 Buffers will be displayed in the command line, in the same order: by most recently used.
@@ -43,7 +53,7 @@ which dismisses the mode once you select a buffer.
 
 **_Tip:_** The first buffer labeled with `1` will always be the current file.
 
-### On the statusline
+## On the statusline
 
 The `:BufstopStatusline` command works the same way as `:BufstopMode`, but displays the buffers
 on the statusline. As before, there is a fast alternative, `:BufstopStatuslineFast` that
@@ -51,7 +61,7 @@ will close the mode once you select something.
 
 **_Tip:_** No worries, your old statusline is restored once you exit the mode.
 
-### Extreme speed
+## Extreme speed hotkeys
 
 The previous methods are cool, but they still require a mapping to bring up the buffer list
 (typically `<leader>b`).    
@@ -64,7 +74,7 @@ Using `:BufstopSpeedToggle` again will clear out these mappings.
 
 **_Tip:_** Pressing `,5,5,5...` will cycle the last 5 buffers.
 
-### Ultimate
+## Ultimate
 
 The previous speed method requires 2 keys to open any arbitrary buffer. Too much? Put this 
 in your `vimrc`:
@@ -81,66 +91,73 @@ Once again, pressing `<F4><F4><F4>...` will cycle between the last 4 buffers.
 these mappings. Bufstop will attempt to restore your old mapping (given that you didn't use
 `noremap`).
 
-### Bonuses
+## Bonuses
 
-As a bonus, this plugin provides __*navigation history for each window*__.    
+1. As a bonus, this plugin provides __*navigation history for each window*__.    
 Use the `:BufstopBack` and `:BufstopForward` to navigate this history.
 
-The other bonus is the ability to sort the buffers by __*MFU (most frequently
+2. The other bonus is the ability to sort the buffers by __*MFU (most frequently
 used)*__. Use the `g:BufstopSorting` option to activate this powerful feature.
 
-### Recommended mappings
+## Recommended mappings
 
 Hopefully we're not crazy to type in those long command names. You can use the below 
 mappings or create your own:
 
     map <leader>b :Bufstop<CR>             " get a visual on the buffers
+    map <leader>w :BufstopPreview<CR>      " switch files by moving inside the window
     map <leader>a :BufstopModeFast<CR>     " a command for quick switching
     map <C-tab>   :BufstopBack<CR>
     map <S-tab>   :BufstopForward<CR>
     let g:BufstopAutoSpeedToggle = 1       " now I can press ,3,3,3 to cycle the last 3 buffers
 
-### Don't like this plugin?
+## Don't like this plugin?
 
 At least put this in your `vimrc`:
 
     :map <leader>b :ls<CR>:b
 
-It will display the buffer list and promt you for a number. Simple, but primitive, especially 
+It will display the buffer list and prompt you for a number. Simple, but primitive, especially 
 when you're dealing with a lot of files.
 
 In addition to this plugin, you can use a fuzzy finder like 
 [CtrlP](https://github.com/kien/ctrlp.vim), which requires you to type parts of the file name.
 
-### Reference documentation
+## Reference documentation
 
-#### Commands:
+### Commands:
 
 * `:Bufstop`  
 
 Invokes the `Bufstop` window. Inside it, each buffer will have an associated 
 hotkey that can be used to open the buffer. 
 
-* `:BufstopFast`   
-
-Same as `:Bufstop`, but the window is closed after you select a buffer.    
 In addition, the following key mappings are present in the `Bufstop` window:
 
-    d          wipe the selected buffer.
+    d          Wipe the selected buffer (close the file)
     <CR>       Open the selected buffer.
     <Esc>      Dismiss the Bufstop window
     k,j        Move up/down to select a buffer.
+
+* `:BufstopFast`   
+
+Same as `:Bufstop`, but the window is closed after you select a buffer.    
+
+* `:BufstopPreview`   
+
+Same as `:Bufstop` but navigating to different rows with k,j or arrow keys will
+instantly swtich buffers.
 
 * `:BufstopMode`
 
 Display the most recently used buffers in the command line and enter Bufstop mode.
 In this mode you can press only a number coresponding to a buffer, or the `<Esc>` key
-which exists the mode. The number of displayed files can be configured using 
+which exits the mode. The number of displayed files can be configured using
 the `g:BufstopModeNumFiles` option.
 
 * `:BufstopModeFast`
 
-Same as `:BufstopMode` but exists the mode once a buffer is selected.
+Same as `:BufstopMode` but exits the mode once a buffer is selected.
 
 * `:BufstopStatusline`
 
@@ -165,7 +182,7 @@ Opens the previous buffer in the navigation history for the current window.
 
 Opens the next buffer in the navigation history for the current window.
 
-#### Config
+## Config
 
 * `g:BufstopKeys`
 
@@ -204,4 +221,6 @@ Controls the way buffers are sorted before being displayed. Valid options are:
 
 Default: `"MRU"`
 
-More options with `:help Bufstop`
+More config options with `:help Bufstop`
+
+Enjoy!

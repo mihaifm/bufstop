@@ -9,6 +9,7 @@ let s:lsoutput = ""
 let s:types = ["fullname", "path", "shortname"]
 let s:local_bufnr = -1
 let s:fast_mode = 0
+let s:preview_mode = 0
 let s:speed_mounted = 0
 let s:bufstop_mode_on = 0
 let s:bufstop_mode_fast = 0
@@ -149,6 +150,20 @@ function! s:MapKeys()
   endfor
 endfunction
 
+function! s:MapPreviewKeys()
+  nnoremap <buffer> <silent> j               j:call <SID>BufstopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> k               k:call <SID>BufstopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> <down>          j:call <SID>BufstopSelectBuffer('cr')<cr>
+  nnoremap <buffer> <silent> <up>            k:call <SID>BufstopSelectBuffer('cr')<cr>
+endfunction
+
+function! s:UnmapPreviewKeys()
+  silent! nunmap <buffer> j
+  silent! nunmap <buffer> k
+  silent! nunmap <buffer> <down>
+  silent! nunmap <buffer> <up>
+endfunction
+
 function! BufstopGetBufferInfo()
     redir => s:lsoutput
     exe "silent ls"
@@ -210,16 +225,29 @@ function! s:GetBufferInfo()
   return s:allbufs
 endfunction
 
-" wrapper for Bufstop()
+" wrapper for Bufstop(), default mode
 function! BufstopSlow()
   let s:fast_mode = 0
+  let s:preview_mode = 0
   call Bufstop()
+  call s:UnmapPreviewKeys()
 endfunction
 
-" wrapper for Bufstop()
+" wrapper for Bufstop(), fast mode
 function! BufstopFast()
   let s:fast_mode = 1
+  let s:preview_mode = 0
   call Bufstop()
+  call s:UnmapPreviewKeys()
+endfunction
+
+" wrapper for Bufstop(), preview mode
+function! BufstopPreview()
+  let s:fast_mode = 0
+  let s:preview_mode = 1
+  call Bufstop()
+
+  call s:MapPreviewKeys()
 endfunction
 
 " main plugin entry point
@@ -272,7 +300,7 @@ function! Bufstop()
   exe '%delete _'
   call setline(1, lines)
   " set cursor on the alternate buffer by default
-  if len(lines) > 1
+  if len(lines) > 1 && !s:preview_mode
     exe 2
   endif
   setlocal nomodifiable
@@ -631,6 +659,7 @@ augroup End
 
 command! Bufstop :call BufstopSlow()
 command! BufstopFast :call BufstopFast()
+command! BufstopPreview :call BufstopPreview()
 command! BufstopSpeedToggle :call BufstopSpeedToggle()
 command! BufstopBack :call <SID>BufstopBack()
 command! BufstopForward :call <SID>BufstopForward()
