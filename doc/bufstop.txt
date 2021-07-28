@@ -1,4 +1,4 @@
-*bufstop.txt*        version 1.5.0
+*bufstop.txt*        version 1.6.0
 
 *Bufstop*
 
@@ -211,7 +211,7 @@ The number of files to be displayed in the |bufstop-mode|. Default is 8.
 
 Mount the speed mappings automatically when loading the plugin. Default is 0.
 
-|g:BufstopSplit|                                *g:BufstopSplit*
+|g:BufstopSplit|                                                    *g:BufstopSplit*
 
 The split location of the |:Bufstop| window. Valid options are the ones that
 influence the |:split| command in Vim: |:topleft|, |:leftabove|, |rigthbelow|, etc.
@@ -225,7 +225,7 @@ The key used to close the |:Bufstop| window. Default:
 >
     "<Esc>"
 
-|g:BufstopSorting|                                             *g:BufstopSorting*
+|g:BufstopSorting|                                                *g:BufstopSorting*
 
 Controls the way buffers are sorted before being displayed. Valid options are:
 
@@ -236,3 +236,7 @@ Controls the way buffers are sorted before being displayed. Valid options are:
 Default
 >
     "MRU"
+
+|g:BufstopIndicators|                                          *g:BufstopIndicators*
+
+Display buffer indicators and flags, in the same way |:ls| does. Default is 0.
