@@ -6,7 +6,7 @@ let g:loaded_bufstop = 1
 
 let s:name = "--Bufstop--"
 let s:lsoutput = ""
-let s:types = ["fullname", "path", "shortname"]
+let s:types = ["fullname", "path", "shortname", "indicators"]
 let s:local_bufnr = -1
 let s:fast_mode = 0
 let s:preview_mode = 0
@@ -46,6 +46,10 @@ endif
 
 if !exists("g:BufstopSorting")
   let g:BufstopSorting = "MRU"
+endif
+
+if !exists("g:BufstopIndicators")
+  let g:BufstopIndicators = 0
 endif
 
 let s:keystr = g:BufstopKeys
@@ -200,6 +204,7 @@ function! s:GetBufferInfo()
     let pathbits = split(bits[1], '\\\|\/', 1)
     let b.shortname = pathbits[len(pathbits)-1]
     let b.bufno = str2nr(bits[0])
+    let b.indicators = substitute(bits[0], '\s*\d\+', '', '')
 
     if (k < len(s:keys))
       let b.key = s:keys[k]
@@ -269,15 +274,21 @@ function! Bufstop()
   for buf in bufdata
     let line = ''
     if buf.key ==# 'X'
-      let line = "  " . " " . "   "
+      let line = "  " . " "
     else
-      let line = "  " . buf.key . "   "
+      let line = "  " . buf.key
+    endif
+
+    if g:BufstopIndicators
+      let pad = s:allpads.indicators
+      let line .= buf.indicators . strpart(pad, len(buf.indicators))
+    else
+      let line .= "   "
     endif
 
     let path = buf["path"]
     let pad = s:allpads.shortname
 
-    " let shortn = fnamemodify(buf.shortname, ":r")
     let line .= buf.shortname . "  " . strpart(pad . path, len(buf.shortname))
     
     call add(lines, line)
