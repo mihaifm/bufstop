@@ -1,4 +1,4 @@
-*bufstop.txt*        version 1.6.0
+*bufstop.txt*        version 1.6.1
 
 *Bufstop*
 
@@ -240,3 +240,16 @@ Default
 |g:BufstopIndicators|                                          *g:BufstopIndicators*
 
 Display buffer indicators and flags, in the same way |:ls| does. Default is 0.
+
+|g:BufstopData|                                                      *g:BufstopData*
+
+A global variable that contains all the buffer information. It can be used for
+scripts and automation. It consists of an array of objects, with each object
+having the following keys:
+
+    path - full path for the file
+    shortname - only file name
+    ext - file extension
+    bufno - buffer number
+    indicators - buffer flags and indicators
+    line - current line in the buffer
