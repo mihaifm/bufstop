@@ -99,6 +99,10 @@ endfunction
 
 " select a buffer from the Bufstop window
 function! s:BufstopSelectBuffer(k)
+  if len(s:allbufs) == 0
+    return
+  endif
+
   let delkey = 0
 
   if (a:k == 'd')
@@ -125,11 +129,7 @@ function! s:BufstopSelectBuffer(k)
 
   if bufexists(s:bufnr)
     if delkey
-      call remove(s:allbufs, line('.')-1)
-      exe "silent bw ".s:bufnr
-      setlocal modifiable
-      exe "d"
-      setlocal nomodifiable
+      call s:BufstopWipeBuffer(s:bufnr)
     else
       exe "wincmd p"
       exe "silent b" s:bufnr
@@ -140,6 +140,41 @@ function! s:BufstopSelectBuffer(k)
       endif
     endif
   endif
+endfunction
+
+" wipe a buffer without altering the window layout
+function! s:BufstopWipeBuffer(bufnr)
+  for window in range(1, winnr("$"))
+    if winbufnr(window) != a:bufnr
+      continue
+    endif
+
+    let candidate = s:allbufs[0].bufno
+    if len(s:allbufs) > 1 && line('.') == 1
+      let candidate = s:allbufs[1].bufno
+    endif
+
+    exe window . "wincmd w"
+    exe "silent b" candidate
+
+    " our candidate may still be the buffer we're trying to wipe
+    if bufnr("%") == a:bufnr
+      " load a dummy buffer in the window
+      exe "enew"
+      setlocal bufhidden=wipe
+      setlocal noswapfile
+      setlocal buftype=
+      setlocal nobuflisted
+    endif
+
+    exe "wincmd p"
+  endfor
+
+  call remove(s:allbufs, line('.')-1)
+  exe "silent bw ".s:bufnr
+  setlocal modifiable
+  exe "d"
+  setlocal nomodifiable
 endfunction
 
 " create mappings for the Bufstop window
