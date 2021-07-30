@@ -4,6 +4,8 @@ endif
 
 let g:loaded_bufstop = 1
 
+let g:BufstopData = []
+
 let s:name = "--Bufstop--"
 let s:lsoutput = ""
 let s:types = ["fullname", "path", "shortname", "indicators"]
@@ -99,7 +101,7 @@ endfunction
 
 " select a buffer from the Bufstop window
 function! s:BufstopSelectBuffer(k)
-  if len(s:allbufs) == 0
+  if len(g:BufstopData) == 0
     return
   endif
 
@@ -114,7 +116,7 @@ function! s:BufstopSelectBuffer(k)
 
   let pos = 0
   if (keyno >= 0 && !delkey)
-    for b in s:allbufs
+    for b in g:BufstopData
       let pos += 1
       if b.key ==# a:k
         let s:bufnr = b.bufno
@@ -124,7 +126,7 @@ function! s:BufstopSelectBuffer(k)
     " move cursor on the selected line
     exe pos
   else
-    let s:bufnr = s:allbufs[line('.')-1].bufno
+    let s:bufnr = g:BufstopData[line('.')-1].bufno
   endif
 
   if bufexists(s:bufnr)
@@ -149,9 +151,9 @@ function! s:BufstopWipeBuffer(bufnr)
       continue
     endif
 
-    let candidate = s:allbufs[0].bufno
-    if len(s:allbufs) > 1 && line('.') == 1
-      let candidate = s:allbufs[1].bufno
+    let candidate = g:BufstopData[0].bufno
+    if len(g:BufstopData) > 1 && line('.') == 1
+      let candidate = g:BufstopData[1].bufno
     endif
 
     exe window . "wincmd w"
@@ -170,7 +172,7 @@ function! s:BufstopWipeBuffer(bufnr)
     exe "wincmd p"
   endfor
 
-  call remove(s:allbufs, line('.')-1)
+  call remove(g:BufstopData, line('.')-1)
   exe "silent bw ".s:bufnr
   setlocal modifiable
   exe "d"
@@ -184,7 +186,7 @@ function! s:MapKeys()
   nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> d                :call <SID>BufstopSelectBuffer('d')<cr>
 
-  for buf in s:allbufs
+  for buf in g:BufstopData
     exe "nnoremap <buffer> <silent> ". buf.key. "   :call <SID>BufstopSelectBuffer('" . buf.key . "')<cr>"
   endfor
 endfunction
@@ -213,8 +215,8 @@ endfunction
 
 " parse buffer list and get relevant info
 function! s:GetBufferInfo()
-  let s:allbufs = []
-  let [s:allbufs, allwidths] = [[], {}]
+  let g:BufstopData = []
+  let [g:BufstopData, allwidths] = [[], {}]
 
   for n in s:types
     let allwidths[n] = []
@@ -232,14 +234,17 @@ function! s:GetBufferInfo()
 
   for buf in bu_li
     let bits = split(buf, '"')
-    let b = {"attributes": bits[0], "line": substitute(bits[2], '\s*', '', '')} 
-    
+    let pathbits = split(bits[1], '\\\|\/', 1)
+
+    let b = {}
+
+    let b.line = substitute(bits[2], '\s*', '', '')
     let b.path = bits[1]
     let b.fullname = bits[1]
-    let pathbits = split(bits[1], '\\\|\/', 1)
     let b.shortname = pathbits[len(pathbits)-1]
     let b.bufno = str2nr(bits[0])
     let b.indicators = substitute(bits[0], '\s*\d\+', '', '')
+    let b.ext = fnamemodify(b.shortname, ":e")
 
     if (k < len(s:keys))
       let b.key = s:keys[k]
@@ -249,7 +254,7 @@ function! s:GetBufferInfo()
 
     let k = k + 1
 
-    call add(s:allbufs, b)
+    call add(g:BufstopData, b)
 
     for n in s:types
       call add(allwidths[n], len(b[n]))
@@ -262,7 +267,7 @@ function! s:GetBufferInfo()
     let s:allpads[n] = repeat(' ', max(allwidths[n]))
   endfor
 
-  return s:allbufs
+  return g:BufstopData
 endfunction
 
 " wrapper for Bufstop(), default mode
@@ -486,11 +491,11 @@ function! BufstopSwitchTo(bufidx)
   call filter(g:Bufstop_history, "buflisted(v:val)")
 
   if a:bufidx >= len(g:Bufstop_history)
-    if !exists("s:allbufs") || a:bufidx >= len(s:allbufs)
+    if !exists("g:BufstopData") || a:bufidx >= len(g:BufstopData)
       call s:BufstopEcho("outside range")
       return
     else
-      exe "b " . s:allbufs[a:bufidx].bufno
+      exe "b " . g:BufstopData[a:bufidx].bufno
     endif
   else
     exe "b " . g:Bufstop_history[a:bufidx]
