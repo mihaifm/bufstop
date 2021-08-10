@@ -135,14 +135,12 @@ function! s:BufstopSelectBuffer(k)
     else
       exe "wincmd p"
       exe "silent b" s:bufnr
-      " save current window view if not exist when previewing buffer
       if !exists('b:bufstop_winview')
         let b:bufstop_winview = winsaveview()
       endif
       exe "wincmd p"
       if s:fast_mode
-        " close and restore window view
-        call BufstopRestoreWinview()
+        call s:BufstopRestoreWinview()
       endif
     endif
   endif
@@ -186,9 +184,9 @@ function! s:BufstopWipeBuffer(bufnr)
   setlocal nomodifiable
 endfunction
 
-function! BufstopRestoreWinview()
-  q
-  wincmd p
+function! s:BufstopRestoreWinview()
+  exe "q"
+  exe "wincmd p"
   if exists('b:bufstop_winview')
     call winrestview(b:bufstop_winview)
     unlet b:bufstop_winview
@@ -197,7 +195,7 @@ endfunction
 
 " create mappings for the Bufstop window
 function! s:MapKeys()
-  exe "nnoremap <buffer> <silent> " . g:BufstopDismissKey . " :call BufstopRestoreWinview()<CR>"
+  exe "nnoremap <buffer> <silent> " . g:BufstopDismissKey . " :call <SID>BufstopRestoreWinview()<CR>"
   nnoremap <buffer> <silent> <cr>             :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> d                :call <SID>BufstopSelectBuffer('d')<cr>
@@ -290,6 +288,7 @@ endfunction
 function! BufstopSlow()
   let s:fast_mode = 0
   let s:preview_mode = 0
+  let b:bufstop_winview = winsaveview()
   call Bufstop()
   call s:UnmapPreviewKeys()
 endfunction
@@ -298,6 +297,7 @@ endfunction
 function! BufstopFast()
   let s:fast_mode = 1
   let s:preview_mode = 0
+  let b:bufstop_winview = winsaveview()
   call Bufstop()
   call s:UnmapPreviewKeys()
 endfunction
@@ -306,6 +306,7 @@ endfunction
 function! BufstopPreview()
   let s:fast_mode = 0
   let s:preview_mode = 1
+  let b:bufstop_winview = winsaveview()
   call Bufstop()
 
   call s:MapPreviewKeys()
@@ -724,16 +725,9 @@ augroup Bufstop
   exe "autocmd BufWinLeave,WinLeave " . s:name . " :call s:TimeoutFiddle(0)"
 augroup End
 
-" save the current window view before open Bufstop window
-command! Bufstop
-      \ let b:bufstop_winview = winsaveview() |
-      \ call BufstopSlow()
-command! BufstopFast
-      \ let b:bufstop_winview = winsaveview() |
-      \ call BufstopFast()
-command! BufstopPreview
-      \ let b:bufstop_winview = winsaveview() |
-      \ call BufstopPreview()
+command! Bufstop call BufstopSlow()
+command! BufstopFast call BufstopFast()
+command! BufstopPreview  call BufstopPreview()
 command! BufstopSpeedToggle call BufstopSpeedToggle()
 command! BufstopBack call <SID>BufstopBack()
 command! BufstopForward call <SID>BufstopForward()

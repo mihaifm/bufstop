@@ -1,4 +1,4 @@
-*bufstop.txt*        version 1.6.1
+*bufstop.txt*        version 1.6.2
 
 *Bufstop*
 
