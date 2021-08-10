@@ -1,4 +1,4 @@
-if exists('g:loaded_bufstop') 
+if exists('g:loaded_bufstop')
   finish
 endif
 
@@ -111,7 +111,7 @@ function! s:BufstopSelectBuffer(k)
     let delkey = 1
   endif
 
-  let keyno = strridx(s:keystr, a:k) 
+  let keyno = strridx(s:keystr, a:k)
   let s:bufnr = -1
 
   let pos = 0
@@ -135,10 +135,14 @@ function! s:BufstopSelectBuffer(k)
     else
       exe "wincmd p"
       exe "silent b" s:bufnr
+      " save current window view if not exist when previewing buffer
+      if !exists('b:bufstop_winview')
+        let b:bufstop_winview = winsaveview()
+      endif
       exe "wincmd p"
       if s:fast_mode
-        exe "q"
-        exe "wincmd p"
+        " close and restore window view
+        call BufstopRestoreWinview()
       endif
     endif
   endif
@@ -158,6 +162,9 @@ function! s:BufstopWipeBuffer(bufnr)
 
     exe window . "wincmd w"
     exe "silent b" candidate
+    if !exists('b:bufstop_winview')
+      let b:bufstop_winview = winsaveview()
+    endif
 
     " our candidate may still be the buffer we're trying to wipe
     if bufnr("%") == a:bufnr
@@ -179,9 +186,18 @@ function! s:BufstopWipeBuffer(bufnr)
   setlocal nomodifiable
 endfunction
 
+function! BufstopRestoreWinview()
+  q
+  wincmd p
+  if exists('b:bufstop_winview')
+    call winrestview(b:bufstop_winview)
+    unlet b:bufstop_winview
+  endif
+endfunction
+
 " create mappings for the Bufstop window
 function! s:MapKeys()
-  exe "nnoremap <buffer> <silent> " . g:BufstopDismissKey . " :q<cr><C-w>p"
+  exe "nnoremap <buffer> <silent> " . g:BufstopDismissKey . " :call BufstopRestoreWinview()<CR>"
   nnoremap <buffer> <silent> <cr>             :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> <2-LeftMouse>    :call <SID>BufstopSelectBuffer('cr')<cr>
   nnoremap <buffer> <silent> d                :call <SID>BufstopSelectBuffer('d')<cr>
@@ -221,7 +237,7 @@ function! s:GetBufferInfo()
   for n in s:types
     let allwidths[n] = []
   endfor
- 
+
   let k = 0
 
   let bu_li = split(s:lsoutput, '\n')
@@ -304,7 +320,7 @@ function! Bufstop()
     return
   endif
 
-  redir => s:lsoutput 
+  redir => s:lsoutput
   exe "silent ls"
   redir END
 
@@ -330,10 +346,10 @@ function! Bufstop()
     let pad = s:allpads.shortname
 
     let line .= buf.shortname . "  " . strpart(pad . path, len(buf.shortname))
-    
+
     call add(lines, line)
   endfor
-  
+
   exe g:BufstopSplit . " " . min([len(lines), 20]) . " split"
 
   if s:local_bufnr < 0
@@ -342,7 +358,7 @@ function! Bufstop()
   else
     exe "b ".s:local_bufnr
   endif
-  
+
   setlocal modifiable
   exe 'setlocal statusline=Bufstop:\ ' . len(lines) . '\ buffers'
   " delete evertying in the buffer
@@ -434,12 +450,12 @@ function! s:BufstopAppend(bufnr)
     let w:history = insert(w:history, a:bufnr, w:history_index)
 endfunction
 
-" add the buffer number to the global navigation history 
+" add the buffer number to the global navigation history
 function! s:BufstopGlobalAppend(bufnr)
   if (!buflisted(a:bufnr))
     return
   endif
-  call filter(g:Bufstop_history, 'v:val != '.a:bufnr) 
+  call filter(g:Bufstop_history, 'v:val != '.a:bufnr)
   call insert(g:Bufstop_history, a:bufnr)
 
   if !has_key(s:frequency_map, a:bufnr)
@@ -519,7 +535,7 @@ function! s:BufstopSpeedMount()
   endif
 
   let s:saved_speed_keys = []
-  let idx = 0 
+  let idx = 0
   for key in g:BufstopSpeedKeys
     let combo = g:BufstopLeader . key
     let maparg = maparg(combo)
@@ -608,7 +624,7 @@ endfunction
 
 " entry point for BufstopMode
 function! BufstopMode()
-  redir => s:lsoutput 
+  redir => s:lsoutput
   exe "silent ls"
   redir END
 
@@ -708,16 +724,23 @@ augroup Bufstop
   exe "autocmd BufWinLeave,WinLeave " . s:name . " :call s:TimeoutFiddle(0)"
 augroup End
 
-command! Bufstop :call BufstopSlow()
-command! BufstopFast :call BufstopFast()
-command! BufstopPreview :call BufstopPreview()
-command! BufstopSpeedToggle :call BufstopSpeedToggle()
-command! BufstopBack :call <SID>BufstopBack()
-command! BufstopForward :call <SID>BufstopForward()
-command! BufstopMode :call <SID>BufstopModeStart()
-command! BufstopModeFast :call <SID>BufstopModeFastStart()
-command! BufstopStatusline :call <SID>BufstopStatusline()
-command! BufstopStatuslineFast :call <SID>BufstopStatuslineFast()
+" save the current window view before open Bufstop window
+command! Bufstop
+      \ let b:bufstop_winview = winsaveview() |
+      \ call BufstopSlow()
+command! BufstopFast
+      \ let b:bufstop_winview = winsaveview() |
+      \ call BufstopFast()
+command! BufstopPreview
+      \ let b:bufstop_winview = winsaveview() |
+      \ call BufstopPreview()
+command! BufstopSpeedToggle call BufstopSpeedToggle()
+command! BufstopBack call <SID>BufstopBack()
+command! BufstopForward call <SID>BufstopForward()
+command! BufstopMode call <SID>BufstopModeStart()
+command! BufstopModeFast call <SID>BufstopModeFastStart()
+command! BufstopStatusline call <SID>BufstopStatusline()
+command! BufstopStatuslineFast call <SID>BufstopStatuslineFast()
 
 if g:BufstopAutoSpeedToggle
   call BufstopSpeedToggle()
