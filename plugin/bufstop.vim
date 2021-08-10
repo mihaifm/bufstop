@@ -162,6 +162,9 @@ function! s:BufstopWipeBuffer(bufnr)
 
     exe window . "wincmd w"
     exe "silent b" candidate
+    if !exists('b:bufstop_winview')
+      let b:bufstop_winview = winsaveview()
+    endif
 
     " our candidate may still be the buffer we're trying to wipe
     if bufnr("%") == a:bufnr
@@ -185,6 +188,7 @@ endfunction
 
 function! BufstopRestoreWinview()
   q
+  wincmd p
   if exists('b:bufstop_winview')
     call winrestview(b:bufstop_winview)
     unlet b:bufstop_winview
