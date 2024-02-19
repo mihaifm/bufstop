@@ -134,7 +134,7 @@ function! s:BufstopSelectBuffer(k)
       call s:BufstopWipeBuffer(s:bufnr)
     else
       exe "wincmd p"
-      exe "silent b" s:bufnr
+      exe "b" s:bufnr
       if !exists('b:bufstop_winview')
         let b:bufstop_winview = winsaveview()
       endif
