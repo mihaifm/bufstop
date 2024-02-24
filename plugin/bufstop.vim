@@ -54,6 +54,10 @@ if !exists("g:BufstopIndicators")
   let g:BufstopIndicators = 0
 endif
 
+if !exists("g:BufstopDefaultSelected")
+  let g:BufstopDefaultSelected = 1
+endif
+
 let s:keystr = g:BufstopKeys
 let s:keys = split(s:keystr, '\zs')
 
@@ -90,8 +94,11 @@ function! s:SetProperties()
   setlocal nospell
   setlocal nobuflisted
   setlocal buftype=nofile
+  setlocal filetype=bufstop
+  setlocal fileformat=
   setlocal noswapfile
   setlocal nowrap
+  setlocal nomodifiable
 
   if has("syntax")
     syn match bufstopKey /\v^\s\s(\d|\a|\s)/ contained
@@ -362,6 +369,10 @@ function! Bufstop()
 
   setlocal modifiable
   exe 'setlocal statusline=Bufstop:\ ' . len(lines) . '\ buffers'
+
+  " trigger BufEnter to allow other plugins to change the statusline 
+  doautocmd BufEnter
+
   " delete evertying in the buffer
   " (can't use 'normal ggdG' since the keys are remapped)
   exe 'goto'
@@ -369,9 +380,8 @@ function! Bufstop()
   call setline(1, lines)
   " set cursor on the alternate buffer by default
   if len(lines) > 1 && !s:preview_mode
-    exe 2
+    exe g:BufstopDefaultSelected
   endif
-  setlocal nomodifiable
 
   call s:SetProperties()
 

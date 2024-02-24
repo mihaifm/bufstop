@@ -1,4 +1,4 @@
-*bufstop.txt*        version 1.6.2
+*bufstop.txt*        version 1.6.3
 
 *Bufstop*
 
@@ -240,6 +240,12 @@ Default
 |g:BufstopIndicators|                                          *g:BufstopIndicators*
 
 Display buffer indicators and flags, in the same way |:ls| does. Default is 0.
+
+|g:BufstopDefaultSelected|                                *g:BufstopDefaultSelected*
+
+Controls the default selection in the |:Bufstop| window. If set to 1, the active
+buffer will be selected. If set to 2, the alternate buffer (previously opened file)
+will be selected. Default value is 1.
 
 |g:BufstopData|                                                      *g:BufstopData*
 

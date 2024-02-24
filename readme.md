@@ -8,11 +8,11 @@ It provides no less than 7 ways to display and switch buffers.
 
 If you can think of faster ways to switch files, let me know and I will include them in the plugin.
 
-![screenshot1](https://cloud.githubusercontent.com/assets/981184/3208138/651a0f36-ee1c-11e3-9a40-5191fdcab2df.png)
-
-![screenshot2](https://cloud.githubusercontent.com/assets/981184/3208142/0306711c-ee1d-11e3-9121-0bfad5d43909.png)
+![screenshot1](https://github.com/mihaifm/bufstop/assets/981184/740f071f-0395-447d-ab17-11065d1c18b3)
 
 ## Buffer window with hotkeys
+
+![recording1](https://github.com/mihaifm/bufstop/assets/981184/a39cc471-d83c-46d8-ba9d-b00754ba11f0)
 
 The `:Bufstop` command opens a new window at the top/bottom of the screen containing the list of
 current buffers, ordered by most recently used. Each buffer has an associated hotkey 
@@ -31,6 +31,8 @@ the previously opened file (aka *alternate buffer*)
 
 ## Preview mode
 
+![recording2](https://github.com/mihaifm/bufstop/assets/981184/133b1af6-a21a-4ba2-8500-f6833ed04717)
+
 The `:BufstopPreview` command is similar to the `:Bufstop` command, with the notable difference that you can
 preview and navigate files by moving **up or down** in the window with `j,k` or arrow keys. 
 It is a powerful and instant way to check your files.
@@ -38,6 +40,8 @@ It is a powerful and instant way to check your files.
 **_Tip:_** You can still switch files by pressing the hotkeys associated with them.
 
 ## Minimal mode inside the command line
+
+![recording3](https://github.com/mihaifm/bufstop/assets/981184/bdb88472-85c7-40f2-99b4-9650d534baac)
 
 Don't like a pottentially huge file list popping on the screen? Use the `:BufstopMode` command.
 Buffers will be displayed in the command line, in the same order: by most recently used.
