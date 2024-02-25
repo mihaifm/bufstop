@@ -58,6 +58,10 @@ if !exists("g:BufstopDefaultSelected")
   let g:BufstopDefaultSelected = 1
 endif
 
+if !exists("g:BufstopFileSymbolFunc")
+  let g:BufstopFileSymbolFunc = "s:BufstopGetFileSymbol"
+endif
+
 let s:keystr = g:BufstopKeys
 let s:keys = split(s:keystr, '\zs')
 
@@ -264,7 +268,7 @@ function! s:GetBufferInfo()
     let b.fullname = bits[1]
     let b.shortname = pathbits[len(pathbits)-1]
     let b.bufno = str2nr(bits[0])
-    let b.indicators = substitute(bits[0], '\s*\d\+', '', '')
+    let b.indicators = trim(substitute(bits[0], '\s*\d\+', '', ''))
     let b.ext = fnamemodify(b.shortname, ":e")
 
     if (k < len(s:keys))
@@ -345,15 +349,16 @@ function! Bufstop()
 
     if g:BufstopIndicators
       let pad = s:allpads.indicators
-      let line .= buf.indicators . strpart(pad, len(buf.indicators))
+      let line .= " " . buf.indicators . strpart(pad, len(buf.indicators)) . " "
     else
-      let line .= "   "
+      let line .= "  "
     endif
 
     let path = buf["path"]
     let pad = s:allpads.shortname
 
-    let line .= buf.shortname . "  " . strpart(pad . path, len(buf.shortname))
+    let fileIcon = call(g:BufstopFileSymbolFunc, [path])
+    let line .= fileIcon . " " . buf.shortname . "  " . strpart(pad . path, len(buf.shortname))
 
     call add(lines, line)
   endfor
@@ -724,6 +729,10 @@ function s:TimeoutFiddle(on_off)
   else
     let &timeoutlen = s:old_timeoutlen
   end
+endfunction
+
+function s:BufstopGetFileSymbol(path)
+  return ''
 endfunction
 
 augroup Bufstop
