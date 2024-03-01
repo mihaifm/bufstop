@@ -247,6 +247,16 @@ Controls the default selection in the |:Bufstop| window. If set to 1, the active
 buffer will be selected. If set to 2, the alternate buffer (previously opened file)
 will be selected. Default value is 1.
 
+|g:BufstopFileSymbolFunc|                                  *g:BufstopFileSymbolFunc*
+
+References a function that can be implemented in vimrc or other plugins to add file 
+symbols next to buffer names. Example for vim-devicons:
+
+    let g:BufstopFileSymbolFunc = 'MyBufstopFileIcon'
+    function MyBufstopFileIcon(path)
+        return WebDevIconsGetFileTypeSymbol(a:path)
+    endfunction
+
 |g:BufstopData|                                                      *g:BufstopData*
 
 A global variable that contains all the buffer information. It can be used for

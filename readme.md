@@ -227,4 +227,14 @@ Default: `"MRU"`
 
 More config options with `:help Bufstop`
 
+## Customization
+
+You can add symbols/icons next to buffer names by implementing `g:BufstopFileSymbolFunc` in you vimrc. 
+Example using the vim-devicons plugin:
+
+    let g:BufstopFileSymbolFunc = 'MyBufstopFileIcon'
+    function MyBufstopFileIcon(path)
+      return WebDevIconsGetFileTypeSymbol(a:path)
+    endfunction
+
 Enjoy!
