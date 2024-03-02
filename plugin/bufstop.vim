@@ -395,14 +395,10 @@ endfunction
 
 " open the previous buffer in the navigation history for the current window.
 function s:BufstopBack()
-  if (!buflisted(winbufnr(winnr())))
-    return
-  endif
-
   if w:history_index > 0
     let w:history_index -= 1
     let bno = w:history[w:history_index]
-    if (bufexists(bno) && buflisted(bno))
+    if (bufexists(bno))
       execute "b " . bno
     else
       call map(w:history, 's:BufstopFilt(v:val, bno)')
@@ -418,14 +414,10 @@ endfunction
 
 " open the next buffer in the navigation history for the current window.
 function! s:BufstopForward()
-  if (!buflisted(winbufnr(winnr())))
-    return
-  endif
-
   if w:history_index < len(w:history) - 1
     let w:history_index += 1
     let bno = w:history[w:history_index]
-    if (bufexists(bno) && buflisted(bno))
+    if (bufexists(bno))
       execute "b " . bno
     else
       call map(w:history, 's:BufstopFilt(v:val, bno)')
