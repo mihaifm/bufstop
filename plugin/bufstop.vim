@@ -62,6 +62,10 @@ if !exists("g:BufstopFileSymbolFunc")
   let g:BufstopFileSymbolFunc = "s:BufstopGetFileSymbol"
 endif
 
+if !exists("g:BufstopShowUnlisted")
+  let g:BufstopShowUnlisted = 0
+endif
+
 let s:keystr = g:BufstopKeys
 let s:keys = split(s:keystr, '\zs')
 
@@ -196,7 +200,7 @@ function! s:BufstopWipeBuffer(bufnr)
 endfunction
 
 function! s:BufstopRestoreWinview()
-  exe "q"
+  exe "close"
   exe "wincmd p"
   if exists('b:bufstop_winview')
     call winrestview(b:bufstop_winview)
@@ -228,14 +232,6 @@ function! s:UnmapPreviewKeys()
   silent! nunmap <buffer> k
   silent! nunmap <buffer> <down>
   silent! nunmap <buffer> <up>
-endfunction
-
-function! BufstopGetBufferInfo()
-    redir => s:lsoutput
-    exe "silent ls"
-    redir END
-
-    return s:GetBufferInfo()
 endfunction
 
 " parse buffer list and get relevant info
@@ -270,6 +266,10 @@ function! s:GetBufferInfo()
     let b.bufno = str2nr(bits[0])
     let b.indicators = trim(substitute(bits[0], '\s*\d\+', '', ''))
     let b.ext = fnamemodify(b.shortname, ":e")
+
+    if b.shortname == s:name
+      continue
+    endif
 
     if (k < len(s:keys))
       let b.key = s:keys[k]
@@ -328,12 +328,12 @@ function! Bufstop()
   let bufstop_winnr = bufwinnr(s:name)
   if bufstop_winnr != -1
     exe bufstop_winnr . "wincmd w"
-    exe "q"
+    exe "close"
     return
   endif
 
   redir => s:lsoutput
-  exe "silent ls"
+  exe g:BufstopShowUnlisted ? "silent ls!" : "silent ls"
   redir END
 
   let lines = []
@@ -633,7 +633,7 @@ endfunction
 " entry point for BufstopMode
 function! BufstopMode()
   redir => s:lsoutput
-  exe "silent ls"
+  exe g:BufstopShowUnlisted ? "silent ls!" : "silent ls"
   redir END
 
   let line = ""
