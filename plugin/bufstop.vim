@@ -466,9 +466,14 @@ endfunction
 
 " add the buffer number to the global navigation history
 function! s:BufstopGlobalAppend(bufnr)
-  if (!buflisted(a:bufnr))
+  if !g:BufstopShowUnlisted && !buflisted(a:bufnr)
     return
   endif
+
+  if bufname(a:bufnr) == s:name
+    return
+  endif
+
   call filter(g:Bufstop_history, 'v:val != '.a:bufnr)
   call insert(g:Bufstop_history, a:bufnr)
 
@@ -518,7 +523,15 @@ endfunction
 
 " switch to a buffer in global history or ls output
 function! BufstopSwitchTo(bufidx)
-  call filter(g:Bufstop_history, "buflisted(v:val)")
+  if !g:BufstopShowUnlisted
+    call filter(g:Bufstop_history, "buflisted(v:val)")
+  endif
+
+  call filter(g:Bufstop_history, "bufexists(v:val)")
+
+  if exists("g:BufstopData")
+    call filter(g:BufstopData, "bufexists((v:val).bufno)")
+  endif
 
   if a:bufidx >= len(g:Bufstop_history)
     if !exists("g:BufstopData") || a:bufidx >= len(g:BufstopData)
