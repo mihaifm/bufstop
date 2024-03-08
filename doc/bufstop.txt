@@ -261,6 +261,17 @@ symbols next to buffer names. Example for vim-devicons:
         return WebDevIconsGetFileTypeSymbol(a:path)
     endfunction
 
+|g:BufstopFileFormatFunc|                                  *g:BufstopFileFormatFunc*
+
+References a function that can be implemented in vimrc or other plugins, with the
+purpose of formatting the file name displayed by Bufstop. Example that hides file
+extensions:
+
+    let g:BufstopFileFormatFunc = 'MyBufstopFileFormat'
+    function! MyBufstopFileFormat(shortname)
+      return fnamemodify(a:shortname, ':t:r')
+    endfunc
+
 |g:BufstopData|                                                      *g:BufstopData*
 
 A global variable that contains all the buffer information. It can be used for

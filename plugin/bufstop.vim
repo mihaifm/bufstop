@@ -62,6 +62,10 @@ if !exists("g:BufstopFileSymbolFunc")
   let g:BufstopFileSymbolFunc = "s:BufstopGetFileSymbol"
 endif
 
+if !exists("g:BufstopFileFormatFunc")
+  let g:BufstopFileFormatFunc = "s:BufstopFileNameFormat"
+endif
+
 if !exists("g:BufstopShowUnlisted")
   let g:BufstopShowUnlisted = 0
 endif
@@ -270,6 +274,8 @@ function! s:GetBufferInfo()
     if b.shortname == s:name
       continue
     endif
+
+    let b.shortname = call(g:BufstopFileFormatFunc, [b.shortname])
 
     if (k < len(s:keys))
       let b.key = s:keys[k]
@@ -664,17 +670,17 @@ function! BufstopMode()
       let to_output = buffy.shortname
     endif
 
-    echohl bufstopName
-    echon " " . to_output
-    let line = line . " " . to_output
+    echohl bufstopKey
+    echon s:keystr[idx]
+    let line .= s:keystr[idx]
     echohl None
 
     echon ":"
     let line .= ":"
 
-    echohl bufstopKey
-    echon s:keystr[idx]
-    let line .= s:keystr[idx]
+    echohl bufstopName
+    echon  to_output . " "
+    let line = line . to_output . " "
     echohl None
 
     let idx += 1
@@ -725,6 +731,10 @@ endfunction
 
 function s:BufstopGetFileSymbol(path)
   return ''
+endfunction
+
+function s:BufstopFileNameFormat(shortname)
+  return a:shortname
 endfunction
 
 augroup Bufstop

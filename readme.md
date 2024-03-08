@@ -237,4 +237,12 @@ Example using the vim-devicons plugin:
       return WebDevIconsGetFileTypeSymbol(a:path)
     endfunction
 
+You can format file names displayed by the plugin by implementing `g:BufstopFileFormatFunc`.
+For example you can hide file extensions:
+
+    let g:BufstopFileFormatFunc = 'MyBufstopFileFormat'
+    function! MyBufstopFileFormat(shortname)
+      return fnamemodify(a:shortname, ':t:r')
+    endfunction
+
 Enjoy!
