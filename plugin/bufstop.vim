@@ -116,6 +116,10 @@ function! s:SetProperties()
     syn match bufstopKey /\v^\s\s(\d|\a|\s)/ contained
     syn match bufstopName /\v^\s\s(\d|\a|\s)\s+.+\s\s/ contains=bufstopKey
   endif
+
+  if exists("&winfixbuf")
+    setlocal winfixbuf
+  endif
 endfunction
 
 " select a buffer from the Bufstop window
