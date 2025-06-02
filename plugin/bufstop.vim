@@ -107,7 +107,6 @@ function! s:SetProperties()
   setlocal nobuflisted
   setlocal buftype=nofile
   setlocal filetype=bufstop
-  setlocal fileformat=
   setlocal noswapfile
   setlocal nowrap
   setlocal nomodifiable
