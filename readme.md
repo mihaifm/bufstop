@@ -108,9 +108,9 @@ used)*__. Use the `g:BufstopSorting` option to activate this powerful feature.
 Hopefully we're not crazy to type in those long command names. You can use the below 
 mappings or create your own:
 
-    map <leader>b :Bufstop<CR>             " get a visual on the buffers
-    map <leader>w :BufstopPreview<CR>      " switch files by moving inside the window
-    map <leader>a :BufstopModeFast<CR>     " a command for quick switching
+    map <leader>b :Bufstop<CR>|             " get a visual on the buffers
+    map <leader>w :BufstopPreview<CR>|      " switch files by moving inside the window
+    map <leader>a :BufstopModeFast<CR>|     " a command for quick switching
     map <C-tab>   :BufstopBack<CR>
     map <S-tab>   :BufstopForward<CR>
     let g:BufstopAutoSpeedToggle = 1       " now I can press ,3,3,3 to cycle the last 3 buffers
